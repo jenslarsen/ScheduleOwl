@@ -10,8 +10,8 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
-        
-        childFragments = new Fragment[] {
+
+        childFragments = new Fragment[]{
                 new Terms(),
                 new Courses(),
                 new Mentors(),
@@ -27,5 +27,11 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return childFragments.length;
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        String title = getItem(position).getClass().getName();
+        return title.subSequence(title.lastIndexOf(".") + 1, title.length());
     }
 }
