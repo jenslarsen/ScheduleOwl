@@ -1,6 +1,6 @@
 package com.jenslarsen.scheduleowl;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -14,7 +14,7 @@ public class Terms extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_terms, container, false);
         Button buttonTerms = rootView.findViewById(R.id.buttonTerms);
         buttonTerms.setOnClickListener(new View.OnClickListener() {
