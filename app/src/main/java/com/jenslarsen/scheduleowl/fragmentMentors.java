@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class Mentors extends Fragment {
+public class fragmentMentors extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -21,7 +21,7 @@ public class Mentors extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Mentors Button", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "fragmentMentors Button", Toast.LENGTH_SHORT).show();
             }
         });
 

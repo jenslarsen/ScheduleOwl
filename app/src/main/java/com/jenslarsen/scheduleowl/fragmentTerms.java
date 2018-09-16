@@ -10,18 +10,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class Assessments extends Fragment {
+public class fragmentTerms extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View rootView = inflater.inflate(R.layout.fragment_assessments, container, false);
-        Button buttonAssessments = rootView.findViewById(R.id.buttonAssessments);
-        buttonAssessments.setOnClickListener(new View.OnClickListener() {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.fragment_terms, container, false);
+        Button buttonTerms = rootView.findViewById(R.id.buttonTerms);
+        buttonTerms.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Assessments Button", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "fragmentTerms Button", Toast.LENGTH_SHORT).show();
             }
         });
 
