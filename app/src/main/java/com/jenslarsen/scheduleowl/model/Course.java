@@ -3,7 +3,7 @@ package com.jenslarsen.scheduleowl.model;
 import java.util.Date;
 import java.util.List;
 
-class Course {
+public class Course {
 
     enum Status {
         IN_PROGRESS, COMPLETED, DROPPED, PLANNED;
@@ -79,5 +79,10 @@ class Course {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.getTitle();
     }
 }
