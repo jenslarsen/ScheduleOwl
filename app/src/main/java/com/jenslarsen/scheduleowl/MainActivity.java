@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.model.Mentor;
 import com.jenslarsen.scheduleowl.model.Term;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,6 +27,13 @@ public class MainActivity extends AppCompatActivity {
             Term tempTerm = new Term();
             tempTerm.setTitle("Term " + index);
             Datasource.terms.add(tempTerm);
+        }
+
+        // add some dummy data to the mentors
+        for( int index = 1; index < 5; index++) {
+            Mentor tempMentor = new Mentor();
+            tempMentor.setName("Mentor " + index);
+            Datasource.mentors.add(tempMentor);
         }
     }
 }

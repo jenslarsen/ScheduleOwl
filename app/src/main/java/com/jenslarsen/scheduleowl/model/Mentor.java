@@ -1,6 +1,6 @@
 package com.jenslarsen.scheduleowl.model;
 
-class Mentor {
+public class Mentor {
     private String name;
     private String phoneNumber;
     private String emailAddress;
@@ -27,5 +27,10 @@ class Mentor {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    @Override
+    public String toString() {
+        return this.getName();
     }
 }
