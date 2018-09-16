@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     private Fragment[] childFragments;
+    private String[] tabTitles = new String[] { "Terms", "Courses", "Mentors", "Assessments"};
 
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -31,7 +32,6 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        String title = getItem(position).getClass().getName();
-        return title.subSequence(title.lastIndexOf(".") + 1, title.length());
+        return tabTitles[position];
     }
 }
