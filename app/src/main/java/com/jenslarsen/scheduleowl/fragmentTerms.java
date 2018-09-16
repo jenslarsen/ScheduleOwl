@@ -8,14 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Term;
 
-import java.util.ArrayList;
-
 public class fragmentTerms extends Fragment {
-
-    // Dummy list of terms to get layouts working
-    ArrayList<Term> terms = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -24,17 +20,10 @@ public class fragmentTerms extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_terms, container, false);
 
-        // populate the temp array of terms
-        for (int index = 0; index < 5; index++) {
-            Term tempTerm = new Term();
-            tempTerm.setTitle("Term " + index);
-            terms.add(tempTerm);
-        }
-
         ListView listView = rootView.findViewById(R.id.listViewTerms);
 
         ArrayAdapter<Term> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
-                R.id.textViewListItem,terms);
+                R.id.textViewListItem, Datasource.terms);
         listView.setAdapter(adapter);
 
         return rootView;

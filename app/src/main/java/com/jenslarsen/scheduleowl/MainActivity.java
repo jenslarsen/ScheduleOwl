@@ -5,6 +5,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.model.Term;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -17,5 +20,12 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
+
+        // add some dummy data to the terms
+        for( int index = 1; index < 5; index++) {
+            Term tempTerm = new Term();
+            tempTerm.setTitle("Term " + index);
+            Datasource.terms.add(tempTerm);
+        }
     }
 }
