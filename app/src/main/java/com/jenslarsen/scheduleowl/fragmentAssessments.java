@@ -1,29 +1,30 @@
 package com.jenslarsen.scheduleowl;
 
-import android.support.v4.app.Fragment;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.model.Assessment;
 
 public class fragmentAssessments extends Fragment {
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
         View rootView = inflater.inflate(R.layout.fragment_assessments, container, false);
-        Button buttonAssessments = rootView.findViewById(R.id.buttonAssessments);
-        buttonAssessments.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "fragmentAssessments Button", Toast.LENGTH_SHORT).show();
-            }
-        });
+
+        ListView listView = rootView.findViewById(R.id.listViewAssessments);
+
+        ArrayAdapter<Assessment> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
+                R.id.textViewListItem, Datasource.assessments);
+        listView.setAdapter(adapter);
 
         return rootView;
     }

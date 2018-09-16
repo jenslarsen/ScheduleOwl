@@ -2,7 +2,7 @@ package com.jenslarsen.scheduleowl.model;
 
 import java.util.Date;
 
-class Assessment {
+public class Assessment {
     private String title;
     private Date dueDate;
 
@@ -20,5 +20,10 @@ class Assessment {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
     }
 }
