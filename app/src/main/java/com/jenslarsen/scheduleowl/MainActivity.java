@@ -1,9 +1,11 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Assessment;
@@ -12,6 +14,17 @@ import com.jenslarsen.scheduleowl.model.Mentor;
 import com.jenslarsen.scheduleowl.model.Term;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // do nothing for now
+        } else {
+            // do nothing for now
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
