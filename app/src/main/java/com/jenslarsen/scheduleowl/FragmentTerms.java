@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Term;
 
-public class fragmentTerms extends Fragment {
+public class FragmentTerms extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

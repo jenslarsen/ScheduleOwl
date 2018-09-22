@@ -9,21 +9,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
-import com.jenslarsen.scheduleowl.model.Course;
+import com.jenslarsen.scheduleowl.model.Assessment;
 
-public class fragmentCourses extends Fragment {
+public class FragmentAssessments extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        View rootView = inflater.inflate(R.layout.fragment_courses, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_assessments, container, false);
 
-        ListView listView = rootView.findViewById(R.id.listViewCourses);
+        ListView listView = rootView.findViewById(R.id.listViewAssessments);
 
-        ArrayAdapter<Course> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
-                R.id.textViewListItem, Datasource.courses);
+        ArrayAdapter<Assessment> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
+                R.id.textViewListItem, Datasource.assessments);
         listView.setAdapter(adapter);
 
         return rootView;

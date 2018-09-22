@@ -11,7 +11,7 @@ import android.widget.ListView;
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Mentor;
 
-public class fragmentMentors extends Fragment {
+public class FragmentMentors extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
