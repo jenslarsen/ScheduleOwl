@@ -13,10 +13,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         super(fm);
 
         childFragments = new Fragment[]{
-                new fragmentTerms(),
-                new fragmentCourses(),
-                new fragmentMentors(),
-                new fragmentAssessments()
+                new FragmentTerms(),
+                new FragmentCourses(),
+                new FragmentMentors(),
+                new FragmentAssessments()
         };
     }
 
