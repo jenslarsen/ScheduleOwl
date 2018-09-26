@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Assessment;
@@ -26,6 +28,19 @@ public class FragmentAssessments extends Fragment {
                 R.id.textViewListItem, Datasource.assessments);
         listView.setAdapter(adapter);
 
+        Button buttonAddAssessment = rootView.findViewById(R.id.buttonAddAssessment);
+
+        buttonAddAssessment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buttonAddAssessmentClicked();
+            }
+        });
+
         return rootView;
+    }
+
+    public void buttonAddAssessmentClicked() {
+        Toast.makeText(getContext(), "Add Assessment here", Toast.LENGTH_SHORT).show();
     }
 }
