@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -36,10 +37,18 @@ public class FragmentTerms extends Fragment {
             }
         });
 
+        Button buttonAddTerm = rootView.findViewById(R.id.buttonAddTerm);
+        buttonAddTerm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buttonAddTermClicked();
+            }
+        });
+
         return rootView;
     }
 
-    public void addTermClicked(View view) {
-        Toast.makeText(getContext(), "Add Term clicked!", Toast.LENGTH_SHORT).show();
+    public void buttonAddTermClicked(){
+        Toast.makeText(getContext(), "Add Term here", Toast.LENGTH_SHORT).show();
     }
 }
