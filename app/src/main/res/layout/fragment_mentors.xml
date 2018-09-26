@@ -6,6 +6,13 @@
     android:orientation="vertical"
     tools:context=".FragmentMentors">
 
+    <Button
+        android:id="@+id/buttonAddMentor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="addMentorClicked"
+        android:text="@string/add_mentor" />
+
     <ListView
         android:id="@+id/listViewMentors"
         android:layout_width="match_parent"
