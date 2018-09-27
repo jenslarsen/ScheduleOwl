@@ -52,9 +52,9 @@ public class FragmentTerms extends Fragment {
         startActivity(intent);
     }
 
-    public void termItemClicked(int position) {
+    public void termItemClicked(int selectedPosition) {
         Intent intent = new Intent(getActivity(), EditTerm.class);
-        intent.putExtra("position", position);
+        intent.putExtra("selectedPosition", selectedPosition);
         startActivity(intent);
     }
 }
