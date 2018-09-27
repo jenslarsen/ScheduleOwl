@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">ScheduleOwl</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_assessment">Add Assessment</string>
+    <string name="add_course">Add Course</string>
+    <string name="add_mentor">Add Mentor</string>
+    <string name="add_term">Add Term</string>
 </resources>

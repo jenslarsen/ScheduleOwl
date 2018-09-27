@@ -12,8 +12,7 @@
         android:id="@+id/buttonAddTerm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="addTermClicked"
-        android:text="Add Term" />
+        android:text="@string/add_term" />
 
     <ListView
         android:id="@+id/listViewTerms"
