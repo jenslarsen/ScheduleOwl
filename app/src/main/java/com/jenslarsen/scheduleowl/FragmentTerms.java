@@ -1,5 +1,6 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -33,7 +34,7 @@ public class FragmentTerms extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("Term", "Item " + position);
+                termClicked(position);
             }
         });
 
@@ -48,7 +49,14 @@ public class FragmentTerms extends Fragment {
         return rootView;
     }
 
-    public void buttonAddTermClicked(){
-        Toast.makeText(getContext(), "Add Term here", Toast.LENGTH_SHORT).show();
+    public void buttonAddTermClicked() {
+        Intent intent = new Intent(getActivity(), AddTerm.class);
+        startActivity(intent);
+    }
+
+    public void termClicked(int position) {
+        Intent intent = new Intent(getActivity(), EditTerm.class);
+        intent.putExtra("position", position);
+        startActivity(intent);
     }
 }
