@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".EditTerm">
 
-    <ScrollView
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -81,6 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="buttonSaveClicked"
                     android:text="Save" />
 
                 <Button
@@ -88,6 +88,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:onClick="buttonCancelClicked"
                     android:text="Cancel" />
             </LinearLayout>
         </LinearLayout>
