@@ -1,9 +1,12 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Term;
@@ -38,5 +41,21 @@ public class EditTerm extends AppCompatActivity {
 
     public void buttonCancelClicked(View view) {
         finish();
+    }
+
+    public void buttonDeleteClicked(View view) {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Term")
+                .setMessage("Are you sure?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(EditTerm.this, "Yes", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
+        Toast.makeText(this, "Delete here", Toast.LENGTH_SHORT).show();
     }
 }
