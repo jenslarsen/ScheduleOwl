@@ -1,5 +1,6 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,7 +10,6 @@ import android.widget.ListView;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Course;
-import com.jenslarsen.scheduleowl.model.Term;
 
 public class AddTerm extends AppCompatActivity {
 
@@ -26,14 +26,16 @@ public class AddTerm extends AppCompatActivity {
     }
 
     public void buttonSaveClicked(View view) {
+        Intent intent = new Intent();
+
         EditText editTextTitle = findViewById(R.id.editTextTitle);
-
         String termTitle = editTextTitle.getText().toString();
-
-        Term newTerm = new Term();
-        newTerm.setTitle(termTitle);
-
-        Datasource.terms.add(newTerm);
+        if (termTitle.isEmpty()) {
+            setResult(RESULT_CANCELED);
+        } else {
+            intent.putExtra("termTitle", termTitle);
+            setResult(RESULT_OK, intent);
+        }
         finish();
     }
 

@@ -14,7 +14,11 @@ import android.widget.ListView;
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Term;
 
+import static android.app.Activity.RESULT_OK;
+
 public class FragmentTerms extends Fragment {
+
+    public final static int ADD_TERM = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,12 +53,27 @@ public class FragmentTerms extends Fragment {
 
     public void buttonAddTermClicked() {
         Intent intent = new Intent(getActivity(), AddTerm.class);
-        startActivity(intent);
+        startActivityForResult(intent, ADD_TERM);
     }
 
     public void termItemClicked(int selectedPosition) {
         Intent intent = new Intent(getActivity(), EditTerm.class);
         intent.putExtra("selectedPosition", selectedPosition);
-        startActivity(intent);
+        startActivityForResult(intent, ADD_TERM);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ADD_TERM) {
+            if (resultCode == RESULT_OK) {
+                Term newTerm = new Term();
+                String termTitle = data.getStringExtra("termTitle");
+                newTerm.setTitle(termTitle);
+                Datasource.terms.add(newTerm);
+            }
+        }
+//        adapter.notifyDataSetChanged();
     }
 }
