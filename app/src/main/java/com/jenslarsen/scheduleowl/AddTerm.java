@@ -19,11 +19,11 @@ import java.util.Locale;
 
 public class AddTerm extends AppCompatActivity {
 
-    public Calendar calendar;
-
     public EditText editTextStartDate;
-    DatePickerDialog.OnDateSetListener startDatePicker;
     public EditText editTextEndDate;
+
+    public Calendar calendar;
+    DatePickerDialog.OnDateSetListener startDatePicker;
     DatePickerDialog.OnDateSetListener endDatePicker;
 
     @Override
@@ -31,6 +31,7 @@ public class AddTerm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_term);
 
+        // set up array adapter
         final ListView listView = findViewById(R.id.listViewCourses);
 
         ArrayAdapter<Course> adapter = new ArrayAdapter<>(this, R.layout.listitem_chooser,
@@ -39,13 +40,14 @@ public class AddTerm extends AppCompatActivity {
 
         calendar = Calendar.getInstance();
 
+        // set up start date picker
         editTextStartDate = findViewById(R.id.editTextStartDate);
         startDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 updateStartDate();
             }
         };
@@ -53,19 +55,22 @@ public class AddTerm extends AppCompatActivity {
         editTextStartDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DatePickerDialog(AddTerm.this, startDatePicker, calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                new DatePickerDialog(AddTerm.this, startDatePicker,
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH))
+                        .show();
             }
         });
 
-
+        // set up end date picker
         editTextEndDate = findViewById(R.id.editTextEndDate);
         endDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 updateEndDate();
             }
         };
@@ -73,28 +78,11 @@ public class AddTerm extends AppCompatActivity {
         editTextEndDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DatePickerDialog(AddTerm.this, endDatePicker, calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-
-
-        editTextEndDate = findViewById(R.id.editTextEndDate);
-        endDatePicker = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                calendar.set(Calendar.YEAR, year);
-                calendar.set(Calendar.MONTH, month);
-                calendar.set(Calendar.YEAR, year);
-                updateEndDate();
-            }
-        };
-
-        editTextEndDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(AddTerm.this, endDatePicker, calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+                new DatePickerDialog(AddTerm.this, endDatePicker,
+                        calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DAY_OF_MONTH))
+                        .show();
             }
         });
     }
