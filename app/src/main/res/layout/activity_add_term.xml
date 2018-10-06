@@ -8,7 +8,7 @@
     tools:context=".AddTerm">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textViewAddTerm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_new_term"
@@ -40,8 +40,10 @@
         android:id="@+id/editTextStartDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
         android:ems="10"
         android:focusable="false"
+        android:hint="MM/DD/YYYY"
         android:importantForAutofill="no"
         android:inputType="date" />
 
@@ -55,7 +57,10 @@
         android:id="@+id/editTextEndDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="false"
         android:ems="10"
+        android:focusable="false"
+        android:hint="MM/DD/YYYY"
         android:importantForAutofill="no"
         android:inputType="date" />
 
@@ -92,6 +97,5 @@
             android:layout_weight="10"
             android:onClick="buttonSaveClicked"
             android:text="@string/save" />
-
     </LinearLayout>
 </LinearLayout>
