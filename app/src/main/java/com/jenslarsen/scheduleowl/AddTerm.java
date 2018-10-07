@@ -9,12 +9,14 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Course;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class AddTerm extends AppCompatActivity {
@@ -103,11 +105,18 @@ public class AddTerm extends AppCompatActivity {
         Intent intent = new Intent();
 
         EditText editTextTitle = findViewById(R.id.editTextTitle);
+        editTextStartDate = findViewById(R.id.editTextStartDate);
+        editTextEndDate = findViewById(R.id.editTextEndDate);
         String termTitle = editTextTitle.getText().toString();
+        String startDate = editTextStartDate.getText().toString();
+        String endDate = editTextEndDate.getText().toString();
         if (termTitle.isEmpty()) {
+            Toast.makeText(this, "No title entered!", Toast.LENGTH_SHORT).show();
             setResult(RESULT_CANCELED);
         } else {
             intent.putExtra("termTitle", termTitle);
+            intent.putExtra( "startDate", startDate);
+            intent.putExtra("endDate", endDate);
             setResult(RESULT_OK, intent);
         }
         finish();
