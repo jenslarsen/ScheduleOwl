@@ -3,6 +3,7 @@ package com.jenslarsen.scheduleowl;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +11,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Term;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
 public class FragmentTerms extends Fragment {
 
     public final static int ADD_TERM = 1;
+    public final static int EDIT_TERM = 2;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +66,7 @@ public class FragmentTerms extends Fragment {
     public void termItemClicked(int selectedPosition) {
         Intent intent = new Intent(getActivity(), EditTerm.class);
         intent.putExtra("selectedPosition", selectedPosition);
-        startActivityForResult(intent, ADD_TERM);
+        startActivityForResult(intent, EDIT_TERM);
     }
 
     @Override
@@ -71,9 +78,32 @@ public class FragmentTerms extends Fragment {
                 Term newTerm = new Term();
                 String termTitle = data.getStringExtra("termTitle");
                 newTerm.setTitle(termTitle);
+
+                String stringStartDate = data.getStringExtra("startDate");
+                String stringEndDate = data.getStringExtra("endDate");
+                try {
+                    Date startDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringStartDate);
+                    newTerm.setStartDate(startDate);
+                } catch (ParseException e) {
+                    Log.e("AddTerm", "Unable to parse start date " + stringStartDate);
+                    e.printStackTrace();
+                    return;
+                }
+                try {
+                    Date endDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringEndDate);
+                    newTerm.setEndDate(endDate);
+                } catch (ParseException e) {
+                    Log.e("AddTerm", "Unable to parse end date " + stringStartDate);
+                    e.printStackTrace();
+                    return;
+                }
+
                 Datasource.terms.add(newTerm);
+            } else if (resultCode == EDIT_TERM) {
+
+            } else {
+                Toast.makeText(getContext(), "No Term added!", Toast.LENGTH_SHORT).show();
             }
         }
-//        adapter.notifyDataSetChanged();
     }
 }
