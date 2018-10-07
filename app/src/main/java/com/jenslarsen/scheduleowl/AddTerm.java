@@ -16,7 +16,6 @@ import com.jenslarsen.scheduleowl.model.Course;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class AddTerm extends AppCompatActivity {
@@ -115,7 +114,7 @@ public class AddTerm extends AppCompatActivity {
             setResult(RESULT_CANCELED);
         } else {
             intent.putExtra("termTitle", termTitle);
-            intent.putExtra( "startDate", startDate);
+            intent.putExtra("startDate", startDate);
             intent.putExtra("endDate", endDate);
             setResult(RESULT_OK, intent);
         }
