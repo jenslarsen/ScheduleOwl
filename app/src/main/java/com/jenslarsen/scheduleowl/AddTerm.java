@@ -5,20 +5,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
-import com.jenslarsen.scheduleowl.model.Course;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
 public class AddTerm extends AppCompatActivity {
+
+    CourseChooserAdapter adapter;
 
     public EditText editTextStartDate;
     public EditText editTextEndDate;
@@ -35,8 +35,7 @@ public class AddTerm extends AppCompatActivity {
         // set up array adapter
         final ListView listView = findViewById(R.id.listViewCourses);
 
-        ArrayAdapter<Course> adapter = new ArrayAdapter<>(this, R.layout.listitem_chooser,
-                R.id.textViewChooser, Datasource.courses);
+        adapter = new CourseChooserAdapter(this, Datasource.courses);
         listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();
