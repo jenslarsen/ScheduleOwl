@@ -6,6 +6,8 @@ import java.util.List;
 public class Term {
     private String title;
     private Date startDate;
+    private Date endDate;
+
     private List<Course> courses;
 
     public String getTitle() {
@@ -24,6 +26,14 @@ public class Term {
         this.startDate = startDate;
     }
 
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
     public List<Course> getCourses() {
         return courses;
     }
@@ -33,7 +43,7 @@ public class Term {
     }
 
     public boolean removeCourse(Course course) {
-        if(courses.contains(course)) {
+        if (courses.contains(course)) {
             courses.remove(course);
             return true;
         }
