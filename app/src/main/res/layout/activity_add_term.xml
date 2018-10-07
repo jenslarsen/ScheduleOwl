@@ -28,7 +28,7 @@
         android:ems="10"
         android:importantForAutofill="no"
         android:inputType="textPersonName"
-        android:text="@string/enter_term_title" />
+        android:hint="Enter Term Title"/>
 
     <TextView
         android:id="@+id/textViewStartDate"
