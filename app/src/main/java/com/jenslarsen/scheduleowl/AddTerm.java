@@ -109,12 +109,13 @@ public class AddTerm extends AppCompatActivity {
         String startDate = editTextStartDate.getText().toString();
         String endDate = editTextEndDate.getText().toString();
         if (termTitle.isEmpty()) {
-            Toast.makeText(this, "No title entered!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No title entered! Unable to add new term", Toast.LENGTH_SHORT).show();
             setResult(RESULT_CANCELED);
         } else {
             intent.putExtra("termTitle", termTitle);
             intent.putExtra("startDate", startDate);
             intent.putExtra("endDate", endDate);
+            intent.putExtra("selectedCourses", adapter.getSelectedCourses());
             setResult(RESULT_OK, intent);
         }
         finish();
