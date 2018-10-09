@@ -23,12 +23,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class FragmentTerms extends Fragment {
 
     public final static int ADD_TERM = 1;
     public final static int EDIT_TERM = 2;
+
+    private ArrayAdapter<Term> adapter;
+    private int selectedPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,14 +43,15 @@ public class FragmentTerms extends Fragment {
 
         final ListView listView = rootView.findViewById(R.id.listViewTerms);
 
-        ArrayAdapter<Term> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
+        adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
                 R.id.textViewListItem, Datasource.terms);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                termItemClicked(position);
+                selectedPosition = position;
+                termItemClicked(selectedPosition);
             }
         });
 
@@ -75,41 +80,49 @@ public class FragmentTerms extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_CANCELED) {
+            if (requestCode == ADD_TERM) {
+                if (resultCode == RESULT_OK) {
+                    Term newTerm = new Term();
+                    String termTitle = data.getStringExtra("termTitle");
+                    newTerm.setTitle(termTitle);
 
-        if (requestCode == ADD_TERM) {
-            if (resultCode == RESULT_OK) {
-                Term newTerm = new Term();
-                String termTitle = data.getStringExtra("termTitle");
-                newTerm.setTitle(termTitle);
+                    String stringStartDate = data.getStringExtra("startDate");
+                    String stringEndDate = data.getStringExtra("endDate");
+                    try {
+                        Date startDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringStartDate);
+                        newTerm.setStartDate(startDate);
+                    } catch (ParseException e) {
+                        Log.e("AddTerm", "Unable to parse start date " + stringStartDate);
+                        e.printStackTrace();
+                        return;
+                    }
+                    try {
+                        Date endDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringEndDate);
+                        newTerm.setEndDate(endDate);
+                    } catch (ParseException e) {
+                        Log.e("AddTerm", "Unable to parse end date " + stringStartDate);
+                        e.printStackTrace();
+                        return;
+                    }
 
-                String stringStartDate = data.getStringExtra("startDate");
-                String stringEndDate = data.getStringExtra("endDate");
-                try {
-                    Date startDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringStartDate);
-                    newTerm.setStartDate(startDate);
-                } catch (ParseException e) {
-                    Log.e("AddTerm", "Unable to parse start date " + stringStartDate);
-                    e.printStackTrace();
-                    return;
+                    ArrayList<Course> selectedCourses
+                            = (ArrayList<Course>) data.getExtras().getSerializable("selectedCourses");
+                    newTerm.setCourses(selectedCourses);
+                    Datasource.terms.add(newTerm);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getContext(), "No Term added!", Toast.LENGTH_SHORT).show();
                 }
-                try {
-                    Date endDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringEndDate);
-                    newTerm.setEndDate(endDate);
-                } catch (ParseException e) {
-                    Log.e("AddTerm", "Unable to parse end date " + stringStartDate);
-                    e.printStackTrace();
-                    return;
+            } else if (requestCode == EDIT_TERM) {
+                boolean deleteTerm = data.getExtras().getBoolean("deleteTerm");
+                if (deleteTerm) {
+                    Datasource.terms.remove(selectedPosition);
                 }
-
-                ArrayList<Course> selectedCourses
-                        = (ArrayList<Course>) data.getExtras().getSerializable("selectedCourses");
-                newTerm.setCourses(selectedCourses);
-                Datasource.terms.add(newTerm);
-            } else if (resultCode == EDIT_TERM) {
-                // TODO: make code to edit the selected term
-            } else {
-                Toast.makeText(getContext(), "No Term added!", Toast.LENGTH_SHORT).show();
+                adapter.notifyDataSetChanged();
             }
         }
     }
 }
+
+

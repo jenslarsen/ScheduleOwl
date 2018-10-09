@@ -1,6 +1,7 @@
 package com.jenslarsen.scheduleowl;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import com.jenslarsen.scheduleowl.model.Term;
 public class EditTerm extends AppCompatActivity {
 
     private int selectedPosition;
+    Intent intent = new Intent();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +54,15 @@ public class EditTerm extends AppCompatActivity {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(EditTerm.this, "Yes", Toast.LENGTH_SHORT).show();
+                        removeTerm();
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
-        Toast.makeText(this, "Delete here", Toast.LENGTH_SHORT).show();
+    }
+
+    private void removeTerm() {
+        intent.putExtra("deleteTerm", true);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
