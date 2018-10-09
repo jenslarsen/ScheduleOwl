@@ -14,10 +14,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.model.Course;
 import com.jenslarsen.scheduleowl.model.Term;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
@@ -98,9 +101,12 @@ public class FragmentTerms extends Fragment {
                     return;
                 }
 
+                ArrayList<Course> selectedCourses
+                        = (ArrayList<Course>) data.getExtras().getSerializable("selectedCourses");
+                newTerm.setCourses(selectedCourses);
                 Datasource.terms.add(newTerm);
             } else if (resultCode == EDIT_TERM) {
-
+                // TODO: make code to edit the selected term
             } else {
                 Toast.makeText(getContext(), "No Term added!", Toast.LENGTH_SHORT).show();
             }
