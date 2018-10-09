@@ -50,6 +50,10 @@ public class Term {
         return false;
     }
 
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
     @Override
     public String toString() {
         return this.getTitle();
