@@ -1,9 +1,10 @@
 package com.jenslarsen.scheduleowl.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Course {
+public class Course implements Serializable {
 
     enum Status {
         IN_PROGRESS, COMPLETED, DROPPED, PLANNED;
