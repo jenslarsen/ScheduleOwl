@@ -11,6 +11,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Term;
@@ -97,14 +98,24 @@ public class EditTerm extends AppCompatActivity {
     }
 
     public void buttonSaveClicked(View view) {
+        Intent intent = new Intent();
+
         EditText editTextTitle = findViewById(R.id.editTextTitle);
-
+        editTextStartDate = findViewById(R.id.editTextStartDate);
+        editTextEndDate = findViewById(R.id.editTextEndDate);
         String termTitle = editTextTitle.getText().toString();
-
-        Term newTerm = new Term();
-        newTerm.setTitle(termTitle);
-
-        Datasource.terms.set(selectedPosition, newTerm);
+        String startDate = editTextStartDate.getText().toString();
+        String endDate = editTextEndDate.getText().toString();
+        if (termTitle.isEmpty()) {
+            Toast.makeText(this, "No title entered! Unable to update term", Toast.LENGTH_SHORT).show();
+            setResult(RESULT_CANCELED);
+        } else {
+            intent.putExtra("termTitle", termTitle);
+            intent.putExtra("startDate", startDate);
+            intent.putExtra("endDate", endDate);
+            intent.putExtra("selectedCourses", adapter.getSelectedCourses());
+            setResult(RESULT_OK, intent);
+        }
         finish();
     }
 
