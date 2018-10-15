@@ -1,5 +1,6 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,12 +9,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Course;
 
 public class FragmentCourses extends Fragment {
+
+    private final int ADD_COURSE = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,6 +42,7 @@ public class FragmentCourses extends Fragment {
     }
 
     public void buttonAddCourseClicked() {
-        Toast.makeText(getContext(), "Add Course here", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getActivity(), AddCourse.class);
+        startActivityForResult(intent, ADD_COURSE);
     }
 }
