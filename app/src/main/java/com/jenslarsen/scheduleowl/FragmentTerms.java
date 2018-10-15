@@ -17,7 +17,6 @@ import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Course;
 import com.jenslarsen.scheduleowl.model.Term;
 
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -90,7 +89,8 @@ public class FragmentTerms extends Fragment {
                     String stringStartDate = data.getStringExtra("startDate");
                     String stringEndDate = data.getStringExtra("endDate");
                     try {
-                        Date startDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringStartDate);
+                        Date startDate = new SimpleDateFormat("DD/mm/yyyy")
+                                .parse(stringStartDate);
                         newTerm.setStartDate(startDate);
                     } catch (ParseException e) {
                         Log.e("AddTerm", "Unable to parse start date " + stringStartDate);
@@ -98,7 +98,8 @@ public class FragmentTerms extends Fragment {
                         return;
                     }
                     try {
-                        Date endDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringEndDate);
+                        Date endDate = new SimpleDateFormat("DD/mm/yyyy")
+                                .parse(stringEndDate);
                         newTerm.setEndDate(endDate);
                     } catch (ParseException e) {
                         Log.e("AddTerm", "Unable to parse end date " + stringStartDate);
@@ -107,7 +108,8 @@ public class FragmentTerms extends Fragment {
                     }
 
                     ArrayList<Course> selectedCourses
-                            = (ArrayList<Course>) data.getExtras().getSerializable("selectedCourses");
+                            = (ArrayList<Course>) data.getExtras()
+                            .getSerializable("selectedCourses");
                     newTerm.setCourses(selectedCourses);
                     Datasource.terms.add(newTerm);
                     adapter.notifyDataSetChanged();
