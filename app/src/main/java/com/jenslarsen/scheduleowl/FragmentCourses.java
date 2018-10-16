@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -16,6 +17,8 @@ import com.jenslarsen.scheduleowl.model.Course;
 public class FragmentCourses extends Fragment {
 
     private final int ADD_COURSE = 1;
+    private final int EDIT_COURSE = 2;
+    private int selectedPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -30,6 +33,14 @@ public class FragmentCourses extends Fragment {
                 R.id.textViewListItem, Datasource.courses);
         listView.setAdapter(adapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedPosition = position;
+                courseItemClicked(selectedPosition);
+            }
+        });
+
         Button buttonAddCourse = rootView.findViewById(R.id.buttonAddCourse);
         buttonAddCourse.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,6 +50,12 @@ public class FragmentCourses extends Fragment {
         });
 
         return rootView;
+    }
+
+    private void courseItemClicked(int selectedPosition) {
+        Intent intent = new Intent(getActivity(), EditCourse.class);
+        intent.putExtra("selectedPosition", selectedPosition);
+        startActivityForResult(intent, EDIT_COURSE);
     }
 
     public void buttonAddCourseClicked() {
