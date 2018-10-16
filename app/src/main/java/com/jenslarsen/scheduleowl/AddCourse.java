@@ -33,6 +33,10 @@ public class AddCourse extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_course);
 
+        editTextTitle = findViewById(R.id.editTextTitle);
+        editTextStartDate = findViewById(R.id.editTextStartDate);
+        editTextEndDate = findViewById(R.id.editTextEndDate);
+
         // set up array adapter
         final ListView listView = findViewById(R.id.listViewAssessments);
 
@@ -103,9 +107,6 @@ public class AddCourse extends AppCompatActivity {
     public void buttonSaveClicked(View view) {
         Intent intent = new Intent();
 
-        editTextTitle = findViewById(R.id.editTextTitle);
-        editTextStartDate = findViewById(R.id.editTextStartDate);
-        editTextEndDate = findViewById(R.id.editTextEndDate);
         String courseTitle = editTextTitle.getText().toString();
         String startDate = editTextStartDate.getText().toString();
         String endDate = editTextEndDate.getText().toString();
@@ -134,8 +135,8 @@ public class AddCourse extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, editTextTitle.getText().toString() + ": "
-                + notes );
+                + notes);
         intent.setType("text/plain");
-        startActivity(Intent.createChooser(intent, notes));
+        startActivity(Intent.createChooser(intent, editTextTitle.getText().toString()));
     }
 }
