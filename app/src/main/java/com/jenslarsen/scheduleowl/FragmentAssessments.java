@@ -1,5 +1,6 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,6 +15,8 @@ import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Assessment;
 
 public class FragmentAssessments extends Fragment {
+
+    private static final int ADD_ASSESSMENT = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,6 +44,8 @@ public class FragmentAssessments extends Fragment {
     }
 
     public void buttonAddAssessmentClicked() {
-        Toast.makeText(getContext(), "Add Assessment here", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getActivity(), AddAssessment.class);
+        startActivityForResult(intent, ADD_ASSESSMENT);
+
     }
 }

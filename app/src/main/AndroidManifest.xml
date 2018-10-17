@@ -25,6 +25,8 @@
         <activity android:name=".EditCourse" />
         <activity android:name=".AddMentor" />
         <activity android:name=".EditMentor" />
+        <activity android:name=".AddAssessment" />
+        <activity android:name=".EditAssessment" />
     </application>
 
 </manifest>
