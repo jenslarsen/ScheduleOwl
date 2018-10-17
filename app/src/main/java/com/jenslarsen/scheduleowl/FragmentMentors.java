@@ -1,19 +1,24 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.Datasource;
 import com.jenslarsen.scheduleowl.model.Mentor;
 
 public class FragmentMentors extends Fragment {
+
+    private static final int ADD_MENTOR = 1;
+    private static final int EDIT_MENTOR = 2;
+    private int selectedPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,10 +41,25 @@ public class FragmentMentors extends Fragment {
             }
         });
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedPosition = position;
+                mentorItemClicked(selectedPosition);
+            }
+        });
+
         return rootView;
     }
 
-    public void buttonAddMentorClicked(){
-        Toast.makeText(getContext(), "Add Mentor clicked", Toast.LENGTH_SHORT).show();
+    public void buttonAddMentorClicked() {
+        Intent intent = new Intent(getActivity(), AddMentor.class);
+        startActivityForResult(intent, ADD_MENTOR);
+    }
+
+    public void mentorItemClicked(int selectedPosition) {
+        Intent intent = new Intent(getActivity(), EditMentor.class);
+        intent.putExtra("selectedPosition", selectedPosition);
+        startActivityForResult(intent, EDIT_MENTOR);
     }
 }

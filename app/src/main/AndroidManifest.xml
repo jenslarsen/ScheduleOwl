@@ -23,6 +23,8 @@
         <activity android:name=".EditTerm" />
         <activity android:name=".AddCourse" />
         <activity android:name=".EditCourse" />
+        <activity android:name=".AddMentor" />
+        <activity android:name=".EditMentor" />
     </application>
 
 </manifest>
