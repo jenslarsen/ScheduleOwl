@@ -27,6 +27,11 @@
         <activity android:name=".EditMentor" />
         <activity android:name=".AddAssessment" />
         <activity android:name=".EditAssessment" />
+
+        <provider
+            android:name=".db.ScheduleProvider"
+            android:authorities="com.jenslarsen.scheduleowl"
+            android:exported="false" />
     </application>
 
 </manifest>
