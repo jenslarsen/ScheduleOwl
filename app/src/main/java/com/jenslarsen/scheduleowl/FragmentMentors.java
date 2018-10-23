@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 import com.jenslarsen.scheduleowl.model.Mentor;
 
 public class FragmentMentors extends Fragment {
@@ -30,7 +30,7 @@ public class FragmentMentors extends Fragment {
         ListView listView = rootView.findViewById(R.id.listViewMentors);
 
         ArrayAdapter<Mentor> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
-                R.id.textViewListItem, Datasource.mentors);
+                R.id.textViewListItem, ScheduleProvider.mentors);
         listView.setAdapter(adapter);
 
         Button buttonAddMentor = rootView.findViewById(R.id.buttonAddMentor);

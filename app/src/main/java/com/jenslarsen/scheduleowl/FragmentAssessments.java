@@ -9,9 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 import com.jenslarsen.scheduleowl.model.Assessment;
 
 public class FragmentAssessments extends Fragment {
@@ -28,7 +27,7 @@ public class FragmentAssessments extends Fragment {
         ListView listView = rootView.findViewById(R.id.listViewAssessments);
 
         ArrayAdapter<Assessment> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
-                R.id.textViewListItem, Datasource.assessments);
+                R.id.textViewListItem, ScheduleProvider.assessments);
         listView.setAdapter(adapter);
 
         Button buttonAddAssessment = rootView.findViewById(R.id.buttonAddAssessment);

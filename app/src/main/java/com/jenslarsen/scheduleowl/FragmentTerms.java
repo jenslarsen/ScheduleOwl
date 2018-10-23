@@ -1,6 +1,8 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,7 +15,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
 import com.jenslarsen.scheduleowl.model.Course;
 import com.jenslarsen.scheduleowl.model.Term;
 
@@ -43,7 +47,7 @@ public class FragmentTerms extends Fragment {
         final ListView listView = rootView.findViewById(R.id.listViewTerms);
 
         adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
-                R.id.textViewListItem, Datasource.terms);
+                R.id.textViewListItem, ScheduleProvider.terms);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -79,19 +83,20 @@ public class FragmentTerms extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        ScheduleDbHelper dbHelper = new ScheduleDbHelper(getContext());
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
         if (resultCode != RESULT_CANCELED) {
             if (requestCode == ADD_TERM) {
                 if (resultCode == RESULT_OK) {
-                    Term newTerm = new Term();
                     String termTitle = data.getStringExtra("termTitle");
-                    newTerm.setTitle(termTitle);
 
                     String stringStartDate = data.getStringExtra("startDate");
                     String stringEndDate = data.getStringExtra("endDate");
                     try {
                         Date startDate = new SimpleDateFormat("DD/mm/yyyy")
                                 .parse(stringStartDate);
-                        newTerm.setStartDate(startDate);
                     } catch (ParseException e) {
                         Log.e("AddTerm", "Unable to parse start date " + stringStartDate);
                         e.printStackTrace();
@@ -100,7 +105,6 @@ public class FragmentTerms extends Fragment {
                     try {
                         Date endDate = new SimpleDateFormat("DD/mm/yyyy")
                                 .parse(stringEndDate);
-                        newTerm.setEndDate(endDate);
                     } catch (ParseException e) {
                         Log.e("AddTerm", "Unable to parse end date " + stringStartDate);
                         e.printStackTrace();
@@ -110,8 +114,23 @@ public class FragmentTerms extends Fragment {
                     ArrayList<Course> selectedCourses
                             = (ArrayList<Course>) data.getExtras()
                             .getSerializable("selectedCourses");
-                    newTerm.setCourses(selectedCourses);
-                    Datasource.terms.add(newTerm);
+
+                    // insert data into database
+                    ContentValues values = new ContentValues();
+
+                    values.put(TermEntry.TITLE, termTitle);
+                    values.put(TermEntry.START_DATE, stringStartDate);
+                    values.put(TermEntry.END_DATE, stringEndDate);
+
+                    long newRowId = db.insert(TermEntry.TABLE_NAME, null, values);
+
+                    if (newRowId < 0) {
+                        Toast.makeText(getContext(), "Unable to update database", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // TODO: Add code to update courses with the correct termId
+
                     adapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(getContext(), "No Term added!", Toast.LENGTH_SHORT).show();
@@ -119,7 +138,7 @@ public class FragmentTerms extends Fragment {
             } else if (requestCode == EDIT_TERM) {
                 boolean deleteTerm = data.getExtras().getBoolean("deleteTerm");
                 if (deleteTerm) {
-                    Datasource.terms.remove(selectedPosition);
+                    ScheduleProvider.terms.remove(selectedPosition);
                 }
                 adapter.notifyDataSetChanged();
             }

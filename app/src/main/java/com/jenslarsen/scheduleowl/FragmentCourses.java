@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 import com.jenslarsen.scheduleowl.model.Course;
 
 public class FragmentCourses extends Fragment {
@@ -30,7 +30,7 @@ public class FragmentCourses extends Fragment {
         ListView listView = rootView.findViewById(R.id.listViewCourses);
 
         ArrayAdapter<Course> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
-                R.id.textViewListItem, Datasource.courses);
+                R.id.textViewListItem, ScheduleProvider.courses);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

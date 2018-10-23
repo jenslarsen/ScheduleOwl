@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,7 +35,7 @@ public class AddTerm extends AppCompatActivity {
         // set up array adapter
         final ListView listView = findViewById(R.id.listViewCourses);
 
-        adapter = new CourseChooserAdapter(this, Datasource.courses);
+        adapter = new CourseChooserAdapter(this, ScheduleProvider.courses);
         listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();

@@ -13,7 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 import com.jenslarsen.scheduleowl.model.Term;
 
 import java.text.SimpleDateFormat;
@@ -38,14 +38,14 @@ public class EditTerm extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         selectedPosition = bundle.getInt("selectedPosition");
-        Term currentTerm = Datasource.terms.get(selectedPosition);
+        Term currentTerm = ScheduleProvider.terms.get(selectedPosition);
         EditText editTextTitle = findViewById(R.id.editTextTitle);
         editTextTitle.setText(currentTerm.getTitle());
 
         // set up array adapter
         final ListView listView = findViewById(R.id.listViewCourses);
 
-        adapter = new CourseChooserAdapter(this, Datasource.courses);
+        adapter = new CourseChooserAdapter(this, ScheduleProvider.courses);
         listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();

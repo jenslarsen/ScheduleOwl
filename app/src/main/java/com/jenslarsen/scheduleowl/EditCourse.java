@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.jenslarsen.scheduleowl.db.Datasource;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,7 +40,7 @@ public class EditCourse extends AppCompatActivity {
         // set up array adapter
         final ListView listView = findViewById(R.id.listViewAssessments);
 
-        adapter = new AssessmentChooserAdapter(this, Datasource.assessments);
+        adapter = new AssessmentChooserAdapter(this, ScheduleProvider.assessments);
         listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();
