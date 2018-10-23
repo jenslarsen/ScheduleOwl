@@ -1,5 +1,6 @@
 package com.jenslarsen.scheduleowl.db;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 public final class ScheduleContract {
@@ -7,17 +8,26 @@ public final class ScheduleContract {
     private ScheduleContract() {
     }
 
+    public static final String CONTENT_AUTHORITY = "com.jenslarsen.scheduleowl";
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    public static final String PATH_ASSESSMENT = "assessment";
+    public static final String PATH_COURSE = "course";
+    public static final String PATH_TERM = "term";
+    public static final String PATH_MENTOR = "mentor";
+
     public static final class AssessmentEntry implements BaseColumns {
-        public static final String TABLE_NAME = "assessments";
+        public static final String TABLE_NAME = "assessment";
         public static final String _ID = BaseColumns._ID;
         public static final String TITLE = "title";
         public static final String DUE_DATE = "dueDate";
         public static final String REMINDER = "reminder";
         public static final String COURSEID = "courseId";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_ASSESSMENT);
     }
 
     public static final class CourseEntry implements BaseColumns {
-        public static final String TABLE_NAME = "courses";
+        public static final String TABLE_NAME = "course";
         public static final String _ID = BaseColumns._ID;
         public static final String TITLE = "title";
         public static final String START_DATE = "startDate";
@@ -32,21 +42,24 @@ public final class ScheduleContract {
         public static final int COMPLETED = 1;
         public static final int DROPPED = 2;
         public static final int PLANNED = 3;
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_COURSE);
     }
 
     public static final class MentorEntry implements BaseColumns {
-        public static final String TABLE_NAME = "mentors";
+        public static final String TABLE_NAME = "mentor";
         public static final String _ID = BaseColumns._ID;
         public static final String NAME = "name";
         public static final String PHONE = "phone";
         public static final String EMAIL = "email";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_MENTOR);
     }
 
     public static final class TermEntry implements BaseColumns {
-        public static final String TABLE_NAME = "terms";
+        public static final String TABLE_NAME = "term";
         public static final String _ID = BaseColumns._ID;
         public static final String TITLE = "title";
         public static final String START_DATE = "startDate";
         public static final String END_DATE = "endDate";
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_TERM);
     }
 }
