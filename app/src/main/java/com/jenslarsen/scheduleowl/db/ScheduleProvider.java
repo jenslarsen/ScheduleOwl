@@ -1,15 +1,23 @@
 package com.jenslarsen.scheduleowl.db;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 import com.jenslarsen.scheduleowl.model.Assessment;
 import com.jenslarsen.scheduleowl.model.Course;
 import com.jenslarsen.scheduleowl.model.Mentor;
 import com.jenslarsen.scheduleowl.model.Term;
+
+import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 
 import java.util.ArrayList;
 
@@ -22,6 +30,34 @@ public class ScheduleProvider extends ContentProvider {
     public static ArrayList<Course> courses = new ArrayList<>();
     public static ArrayList<Assessment> assessments = new ArrayList<>();
 
+    /**
+     * URI Matcher constants
+     */
+    public static final int ASSESSMENT = 1000;
+    public static final int ASSESSMENT_ID = 1001;
+    public static final int COURSE = 2000;
+    public static final int COURSE_ID = 2001;
+    public static final int MENTOR = 3000;
+    public static final int MENTOR_ID = 3001;
+    public static final int TERM = 4000;
+    public static final int TERM_ID = 4001;
+
+    public static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
+    static {
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_ASSESSMENT, ASSESSMENT);
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_ASSESSMENT + "/#", ASSESSMENT_ID);
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_COURSE, COURSE);
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_COURSE + "/#", COURSE_ID);
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_MENTOR, MENTOR);
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_MENTOR + "/#", MENTOR_ID);
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_TERM, TERM);
+        uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_TERM + "/#", TERM_ID);
+    }
+
+    /**
+     * Database helper for external use
+     */
     public static ScheduleDbHelper dbHelper;
 
     /**
@@ -35,6 +71,15 @@ public class ScheduleProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         dbHelper = new ScheduleDbHelper(getContext());
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        Cursor termCursor = db.query(TermEntry.TABLE_NAME, null, null, null, null, null, null);
+        while (termCursor.moveToNext()) {
+            Term tempTerm = new Term();
+            tempTerm.setTitle(termCursor.getString(1));
+            terms.add(tempTerm);
+        }
         return true;
     }
 
@@ -44,7 +89,59 @@ public class ScheduleProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
-        return null;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor;
+
+        int match = uriMatcher.match(uri);
+
+        switch (match) {
+            case ASSESSMENT:
+                cursor = db.query(AssessmentEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case ASSESSMENT_ID:
+                selection = ScheduleContract.AssessmentEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(AssessmentEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case COURSE:
+                cursor = db.query(CourseEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case COURSE_ID:
+                selection = ScheduleContract.CourseEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(CourseEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case MENTOR:
+                cursor = db.query(MentorEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case MENTOR_ID:
+                selection = ScheduleContract.MentorEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(MentorEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case TERM:
+                cursor = db.query(TermEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case TERM_ID:
+                selection = ScheduleContract.TermEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(TermEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+
+        }
+        return cursor;
     }
 
     /**
@@ -52,7 +149,59 @@ public class ScheduleProvider extends ContentProvider {
      */
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
+        final int match = uriMatcher.match(uri);
+        switch (match) {
+            case ASSESSMENT:
+                return insertAssessment(uri, contentValues);
+            case COURSE:
+                return insertCourse(uri, contentValues);
+            case MENTOR:
+                return insertMentor(uri, contentValues);
+            case TERM:
+                return insertTerm(uri, contentValues);
+            default:
+                throw new IllegalArgumentException("Insertion is not supported " + uri);
+        }
+    }
+
+    private Uri insertTerm(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long id = db.insert(TermEntry.TABLE_NAME, null, contentValues);
+        if (id == -1) {
+            Log.e(LOG_TAG, "Insert failed for " + uri);
+            return null;
+        }
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+    private Uri insertMentor(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long id = db.insert(MentorEntry.TABLE_NAME, null, contentValues);
+        if (id == -1) {
+            Log.e(LOG_TAG, "Insert failed for " + uri);
+            return null;
+        }
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+    private Uri insertCourse(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long id = db.insert(CourseEntry.TABLE_NAME, null, contentValues);
+        if (id == -1) {
+            Log.e(LOG_TAG, "Insert failed for " + uri);
+            return null;
+        }
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+    private Uri insertAssessment(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long id = db.insert(AssessmentEntry.TABLE_NAME, null, contentValues);
+        if (id == -1) {
+            Log.e(LOG_TAG, "Insert failed for " + uri);
+            return null;
+        }
+        return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
