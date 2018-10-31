@@ -72,7 +72,7 @@ public class ScheduleProvider extends ContentProvider {
     public boolean onCreate() {
         dbHelper = new ScheduleDbHelper(getContext());
 
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor termCursor = db.query(TermEntry.TABLE_NAME, null, null, null, null, null, null);
         while (termCursor.moveToNext()) {
