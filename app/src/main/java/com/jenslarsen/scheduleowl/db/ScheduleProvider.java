@@ -19,7 +19,12 @@ import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * {@link ContentProvider} for the ScheduleOwl app.
@@ -72,14 +77,8 @@ public class ScheduleProvider extends ContentProvider {
     public boolean onCreate() {
         dbHelper = new ScheduleDbHelper(getContext());
 
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        updateTermsList();
 
-        Cursor termCursor = db.query(TermEntry.TABLE_NAME, null, null, null, null, null, null);
-        while (termCursor.moveToNext()) {
-            Term tempTerm = new Term();
-            tempTerm.setTitle(termCursor.getString(1));
-            terms.add(tempTerm);
-        }
         return true;
     }
 
@@ -223,5 +222,40 @@ public class ScheduleProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         return null;
+    }
+
+    /**
+     * Update the list of terms from the database
+     */
+    public static void updateTermsList() {
+        terms.clear();
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor termCursor = db.query(TermEntry.TABLE_NAME, null, null, null, null, null, null);
+        while (termCursor.moveToNext()) {
+            Term tempTerm = new Term();
+            tempTerm.setTitle(termCursor.getString(1));
+
+            String stringStartDate = termCursor.getString(2);
+            String stringEndDate = termCursor.getString(3);
+            try {
+                Date startDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringStartDate);
+                tempTerm.setStartDate(startDate);
+            } catch (ParseException e) {
+                Log.e(LOG_TAG, "Unable to parse start date " + stringStartDate);
+                e.printStackTrace();
+                return;
+            }
+            try {
+                Date endDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringEndDate);
+                tempTerm.setStartDate(endDate);
+            } catch (ParseException e) {
+                Log.e(LOG_TAG, "Unable to parse end date " + stringStartDate);
+                e.printStackTrace();
+                return;
+            }
+            terms.add(tempTerm);
+        }
     }
 }
