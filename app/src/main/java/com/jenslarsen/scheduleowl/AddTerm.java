@@ -1,7 +1,8 @@
 package com.jenslarsen.scheduleowl;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 
 import java.text.SimpleDateFormat;
@@ -20,12 +22,12 @@ public class AddTerm extends AppCompatActivity {
 
     CourseChooserAdapter adapter;
 
-    public EditText editTextStartDate;
-    public EditText editTextEndDate;
+    private EditText editTextStartDate;
+    private EditText editTextEndDate;
 
-    public Calendar calendar;
-    DatePickerDialog.OnDateSetListener startDatePicker;
-    DatePickerDialog.OnDateSetListener endDatePicker;
+    private Calendar calendar;
+    private DatePickerDialog.OnDateSetListener startDatePicker;
+    private DatePickerDialog.OnDateSetListener endDatePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +102,7 @@ public class AddTerm extends AppCompatActivity {
     }
 
     public void buttonSaveClicked(View view) {
-        Intent intent = new Intent();
+        ContentValues values = new ContentValues();
 
         EditText editTextTitle = findViewById(R.id.editTextTitle);
         editTextStartDate = findViewById(R.id.editTextStartDate);
@@ -110,13 +112,20 @@ public class AddTerm extends AppCompatActivity {
         String endDate = editTextEndDate.getText().toString();
         if (termTitle.isEmpty()) {
             Toast.makeText(this, "No title entered! Unable to add new term", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_CANCELED);
         } else {
-            intent.putExtra("termTitle", termTitle);
-            intent.putExtra("startDate", startDate);
-            intent.putExtra("endDate", endDate);
-            intent.putExtra("selectedCourses", adapter.getSelectedCourses());
-            setResult(RESULT_OK, intent);
+            values.put(ScheduleContract.TermEntry.TITLE, termTitle);
+            values.put(ScheduleContract.TermEntry.START_DATE, startDate);
+            values.put(ScheduleContract.TermEntry.END_DATE, endDate);
+
+            Uri newUri = getContentResolver().insert(ScheduleContract.TermEntry.CONTENT_URI, values);
+            if (newUri == null) {
+                Toast.makeText(this, "Insert Term Failed!", Toast.LENGTH_SHORT).show();
+            }
+
+            ScheduleProvider.updateTermsList();
+            FragmentTerms.adapter.notifyDataSetChanged();
+
+            // TODO: Add code to update courses with the correct termId
         }
         finish();
     }
