@@ -120,6 +120,7 @@ public class AddTerm extends AppCompatActivity {
             Uri newUri = getContentResolver().insert(ScheduleContract.TermEntry.CONTENT_URI, values);
             if (newUri == null) {
                 Toast.makeText(this, "Insert Term Failed!", Toast.LENGTH_SHORT).show();
+                return;
             }
 
             ScheduleProvider.updateTermsList();
