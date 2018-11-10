@@ -46,9 +46,10 @@ public class ScheduleProvider extends ContentProvider {
 
     public static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     public static SimpleDateFormat sdf;
+    private static String dateFormat = "yyyy-MM-dd";
 
     static {
-        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        sdf = new SimpleDateFormat(dateFormat);
         uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_ASSESSMENT, ASSESSMENT);
         uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_ASSESSMENT + "/#", ASSESSMENT_ID);
         uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_COURSE, COURSE);
