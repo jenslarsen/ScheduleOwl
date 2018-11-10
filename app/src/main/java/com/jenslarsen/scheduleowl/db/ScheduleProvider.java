@@ -196,6 +196,15 @@ public class ScheduleProvider extends ContentProvider {
     }
 
     private Uri insertMentor(Uri uri, ContentValues contentValues) {
+
+        if (contentValues.getAsString(MentorEntry.NAME) == null) {
+            throw new IllegalArgumentException("Unable to insert mentor. Name cannot be null");
+        } else if (contentValues.getAsString(MentorEntry.PHONE) == null) {
+            throw new IllegalArgumentException("Unable to insert mentor. Phone number cannot be null");
+        } else if (contentValues.getAsString(MentorEntry.EMAIL) == null) {
+            throw new IllegalArgumentException("Unable to insert mentor. Email address cannot be null.");
+        }
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         long id = db.insert(MentorEntry.TABLE_NAME, null, contentValues);
         if (id == -1) {
@@ -206,6 +215,13 @@ public class ScheduleProvider extends ContentProvider {
     }
 
     private Uri insertCourse(Uri uri, ContentValues contentValues) {
+        if (contentValues.getAsString(CourseEntry.TITLE) == null) {
+            throw new IllegalArgumentException("Unable to insert course. Title cannot be null");
+        } else if (contentValues.getAsString(CourseEntry.START_DATE) == null) {
+            throw new IllegalArgumentException("Unable to insert course. Start Date cannot be null");
+        } else if (contentValues.getAsString(CourseEntry.END_DATE) == null) {
+            throw new IllegalArgumentException("Unable to insert course. End Date cannot be null.");
+        }
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         long id = db.insert(CourseEntry.TABLE_NAME, null, contentValues);
         if (id == -1) {
@@ -216,6 +232,12 @@ public class ScheduleProvider extends ContentProvider {
     }
 
     private Uri insertAssessment(Uri uri, ContentValues contentValues) {
+        if (contentValues.getAsString(AssessmentEntry.TITLE) == null) {
+            throw new IllegalArgumentException("Unable to insert assessment. Title cannot be null");
+        } else if (contentValues.getAsString(AssessmentEntry.DUE_DATE) == null) {
+            throw new IllegalArgumentException("Unable to insert assessment. Due Date cannot be null");
+        }
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         long id = db.insert(AssessmentEntry.TABLE_NAME, null, contentValues);
         if (id == -1) {
