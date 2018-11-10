@@ -25,6 +25,8 @@ public class AddTerm extends AppCompatActivity {
     private EditText editTextStartDate;
     private EditText editTextEndDate;
 
+    private String dateFormat = "yyyy-MM-dd";
+
     private Calendar calendar;
     private DatePickerDialog.OnDateSetListener startDatePicker;
     private DatePickerDialog.OnDateSetListener endDatePicker;
@@ -90,13 +92,11 @@ public class AddTerm extends AppCompatActivity {
     }
 
     private void updateStartDate() {
-        String dateFormat = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
         editTextStartDate.setText(sdf.format(calendar.getTime()));
     }
 
     private void updateEndDate() {
-        String dateFormat = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
         editTextEndDate.setText(sdf.format(calendar.getTime()));
     }
