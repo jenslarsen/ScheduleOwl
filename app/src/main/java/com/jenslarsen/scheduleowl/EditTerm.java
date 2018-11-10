@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -50,21 +49,21 @@ public class EditTerm extends AppCompatActivity {
         EditText editTextTitle = findViewById(R.id.editTextTitle);
         editTextTitle.setText(currentTerm.getTitle());
 
-        EditText editTextStartDate = findViewById(R.id.editTextStartDate);
+        editTextEndDate = findViewById(R.id.editTextEndDate);
+        editTextStartDate = findViewById(R.id.editTextStartDate);
+
         Date startDate = currentTerm.getStartDate();
         if (startDate != null) {
             editTextStartDate.setText(sdf.format(startDate));
         }
 
-        EditText editTextEndDate = findViewById(R.id.editTextEndDate);
         Date endDate = currentTerm.getEndDate();
         if (endDate != null) {
             editTextEndDate.setText(sdf.format(endDate));
         }
 
         // set up array adapter
-        final ListView listView = findViewById(R.id.listViewCourses);
-
+        ListView listView = findViewById(R.id.listViewCourses);
         adapter = new CourseChooserAdapter(this, ScheduleProvider.courses);
         listView.setAdapter(adapter);
 
@@ -72,7 +71,6 @@ public class EditTerm extends AppCompatActivity {
 
         // set up start date picker
         // TODO: Fix date picker so it shows the date from the current term
-        editTextStartDate = findViewById(R.id.editTextStartDate);
         startDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -96,7 +94,6 @@ public class EditTerm extends AppCompatActivity {
 
         // set up end date picker
         // TODO: Fix date picker so it shows the date from the current term
-        editTextEndDate = findViewById(R.id.editTextEndDate);
         endDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -124,17 +121,11 @@ public class EditTerm extends AppCompatActivity {
 
         EditText editTextTitle = findViewById(R.id.editTextTitle);
         editTextStartDate = findViewById(R.id.editTextStartDate);
-        editTextEndDate = findViewById(R.id.editTextEndDate);
         String termTitle = editTextTitle.getText().toString();
-        String startDate = editTextStartDate.getText().toString();
-        String endDate = editTextEndDate.getText().toString();
         if (termTitle.isEmpty()) {
             Toast.makeText(this, "No title entered! Unable to update term", Toast.LENGTH_SHORT).show();
             setResult(RESULT_CANCELED);
         } else {
-            intent.putExtra("termTitle", termTitle);
-            intent.putExtra("startDate", startDate);
-            intent.putExtra("endDate", endDate);
             intent.putExtra("selectedCourses", adapter.getSelectedCourses());
             setResult(RESULT_OK, intent);
         }
