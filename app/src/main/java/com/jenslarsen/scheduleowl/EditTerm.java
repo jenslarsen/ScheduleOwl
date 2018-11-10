@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import com.jenslarsen.scheduleowl.model.Term;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class EditTerm extends AppCompatActivity {
@@ -31,6 +33,12 @@ public class EditTerm extends AppCompatActivity {
     private TextView editTextEndDate;
     private DatePickerDialog.OnDateSetListener endDatePicker;
 
+    private static Term currentTerm;
+
+    private String dateFormat = "yyyy-MM-dd";
+
+    private SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,9 +46,21 @@ public class EditTerm extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         selectedPosition = bundle.getInt("selectedPosition");
-        Term currentTerm = ScheduleProvider.terms.get(selectedPosition);
+        currentTerm = ScheduleProvider.terms.get(selectedPosition);
         EditText editTextTitle = findViewById(R.id.editTextTitle);
         editTextTitle.setText(currentTerm.getTitle());
+
+        EditText editTextStartDate = findViewById(R.id.editTextStartDate);
+        Date startDate = currentTerm.getStartDate();
+        if (startDate != null) {
+            editTextStartDate.setText(sdf.format(startDate));
+        }
+
+        EditText editTextEndDate = findViewById(R.id.editTextEndDate);
+        Date endDate = currentTerm.getEndDate();
+        if (endDate != null) {
+            editTextEndDate.setText(sdf.format(endDate));
+        }
 
         // set up array adapter
         final ListView listView = findViewById(R.id.listViewCourses);
@@ -51,6 +71,7 @@ public class EditTerm extends AppCompatActivity {
         calendar = Calendar.getInstance();
 
         // set up start date picker
+        // TODO: Fix date picker so it shows the date from the current term
         editTextStartDate = findViewById(R.id.editTextStartDate);
         startDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -74,6 +95,7 @@ public class EditTerm extends AppCompatActivity {
         });
 
         // set up end date picker
+        // TODO: Fix date picker so it shows the date from the current term
         editTextEndDate = findViewById(R.id.editTextEndDate);
         endDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -145,14 +167,10 @@ public class EditTerm extends AppCompatActivity {
     }
 
     private void updateStartDate() {
-        String dateFormat = "MM/dd/yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
         editTextStartDate.setText(sdf.format(calendar.getTime()));
     }
 
     private void updateEndDate() {
-        String dateFormat = "MM/dd/yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
         editTextEndDate.setText(sdf.format(calendar.getTime()));
     }
 }
