@@ -249,7 +249,141 @@ public class ScheduleProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
-        return 0;
+        final int match = uriMatcher.match(uri);
+        switch (match) {
+            case ASSESSMENT:
+                return updateAssessment(uri, contentValues, selection, selectionArgs);
+            case COURSE:
+                return updateCourse(uri, contentValues, selection, selectionArgs);
+            case MENTOR:
+                return updateMentor(uri, contentValues, selection, selectionArgs);
+            case TERM:
+                return updateTerm(uri, contentValues, selection, selectionArgs);
+            case ASSESSMENT_ID:
+                selection = AssessmentEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return updateAssessment(uri, contentValues, selection, selectionArgs);
+            case COURSE_ID:
+                selection = CourseEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return updateCourse(uri, contentValues, selection, selectionArgs);
+            case MENTOR_ID:
+                selection = MentorEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return updateMentor(uri, contentValues, selection, selectionArgs);
+            case TERM_ID:
+                selection = TermEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return updateTerm(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported " + uri);
+        }
+    }
+
+    private int updateTerm(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        Date startDate = new Date();
+        Date endDate = new Date();
+
+        try {
+            if (contentValues.containsKey(TermEntry.TITLE)) {
+                if (contentValues.getAsString(TermEntry.TITLE) == null) {
+                    throw new IllegalArgumentException("Unable to update term. Title cannot be null");
+                }
+            } else if (contentValues.containsKey(TermEntry.START_DATE)) {
+                startDate = sdf.parse(contentValues.getAsString(TermEntry.START_DATE));
+                if (contentValues.getAsString(TermEntry.START_DATE) == null) {
+                    throw new IllegalArgumentException("Unable to insert term. Start Date cannot be null");
+                }
+            } else if (contentValues.containsKey(TermEntry.END_DATE)) {
+                endDate = sdf.parse(contentValues.getAsString(TermEntry.END_DATE));
+                if (contentValues.getAsString(TermEntry.END_DATE) == null) {
+                    throw new IllegalArgumentException("Unable to insert term. End Date cannot be null.");
+                }
+            }
+        } catch (ParseException e) {
+            Log.e(LOG_TAG, "Unable to parse dates while updating term: " + uri);
+            e.printStackTrace();
+            return -1;
+        }
+
+        if (startDate.after(endDate) || endDate.before(startDate)) {
+            throw new IllegalArgumentException("Unable to insert term. Start and End dates do not make sense");
+        }
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int numItemsUpdated = db.update(TermEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        if (numItemsUpdated < 1) {
+            Log.e(LOG_TAG, "Failed to update term:" + uri);
+            return -1;
+        }
+        return numItemsUpdated;
+    }
+
+    private int updateMentor(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        if (contentValues.containsKey(MentorEntry.NAME)) {
+            if (contentValues.getAsString(MentorEntry.NAME) == null) {
+                throw new IllegalArgumentException("Unable to update mentor. Name cannot be null");
+            }
+        } else if (contentValues.containsKey(MentorEntry.PHONE)) {
+            if (contentValues.getAsString(MentorEntry.PHONE) == null) {
+                throw new IllegalArgumentException("Unable to update mentor. Phone number cannot be null");
+            }
+        } else if (contentValues.containsKey(MentorEntry.EMAIL)) {
+            if (contentValues.getAsString(MentorEntry.EMAIL) == null) {
+                throw new IllegalArgumentException("Unable to update mentor. Email address cannot be null.");
+            }
+        }
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int numItemsUpdated = db.update(CourseEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        if (numItemsUpdated < 1) {
+            Log.e(LOG_TAG, "Failed to update course:" + uri);
+            return -1;
+        }
+        return numItemsUpdated;
+    }
+
+    private int updateCourse(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        if (contentValues.containsKey(CourseEntry.TITLE)) {
+            if (contentValues.getAsString(CourseEntry.TITLE) == null) {
+                throw new IllegalArgumentException("Unable to update course. Title cannot be null");
+            }
+        } else if (contentValues.containsKey(CourseEntry.START_DATE)) {
+            if (contentValues.getAsString(CourseEntry.START_DATE) == null) {
+                throw new IllegalArgumentException("Unable to update course. Start Date cannot be null");
+            }
+        } else if (contentValues.containsKey(CourseEntry.END_DATE)) {
+            if (contentValues.getAsString(CourseEntry.END_DATE) == null) {
+                throw new IllegalArgumentException("Unable to update course. End Date cannot be null.");
+            }
+        }
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int numItemsUpdated = db.update(CourseEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        if (numItemsUpdated < 1) {
+            Log.e(LOG_TAG, "Failed to update course:" + uri);
+            return -1;
+        }
+        return numItemsUpdated;
+    }
+
+    private int updateAssessment(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        if (contentValues.containsKey(AssessmentEntry.TITLE)) {
+            if (contentValues.getAsString(AssessmentEntry.TITLE) == null) {
+                throw new IllegalArgumentException("Unable to update assessment. Title cannot be null");
+            }
+        } else if (contentValues.containsKey(AssessmentEntry.DUE_DATE)) {
+            if (contentValues.getAsString(AssessmentEntry.DUE_DATE) == null) {
+                throw new IllegalArgumentException("Unable to update assessment. Due Date cannot be null");
+            }
+        }
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int numItemsUpdated = db.update(AssessmentEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        if (numItemsUpdated < 1) {
+            Log.e(LOG_TAG, "Failed to update assessment:" + uri);
+            return -1;
+        }
+        return numItemsUpdated;
     }
 
     /**
