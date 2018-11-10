@@ -9,22 +9,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 import com.jenslarsen.scheduleowl.model.Assessment;
 import com.jenslarsen.scheduleowl.model.Course;
 import com.jenslarsen.scheduleowl.model.Mentor;
 import com.jenslarsen.scheduleowl.model.Term;
 
-import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
-import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
-import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
-import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * {@link ContentProvider} for the ScheduleOwl app.
@@ -48,8 +45,10 @@ public class ScheduleProvider extends ContentProvider {
     public static final int TERM_ID = 4001;
 
     public static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    public static SimpleDateFormat sdf;
 
     static {
+        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_ASSESSMENT, ASSESSMENT);
         uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_ASSESSMENT + "/#", ASSESSMENT_ID);
         uriMatcher.addURI(ScheduleContract.CONTENT_AUTHORITY, ScheduleContract.PATH_COURSE, COURSE);
@@ -165,6 +164,33 @@ public class ScheduleProvider extends ContentProvider {
 
     private Uri insertTerm(Uri uri, ContentValues contentValues) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Date startDate;
+        Date endDate;
+        if (contentValues.get(TermEntry.TITLE) == null) {
+            Log.e(LOG_TAG, "Unable to insert term. Title cannot be null");
+            return null;
+        } else if (contentValues.get(TermEntry.START_DATE) == null) {
+            Log.e(LOG_TAG, "Unable to insert term. Start Date cannot be null");
+            return null;
+        } else if (contentValues.get(TermEntry.END_DATE) == null) {
+            Log.e(LOG_TAG, "Unable to insert term. End Date cannot be null.");
+            return null;
+        }
+        try {
+            startDate = sdf.parse((String) contentValues.get(TermEntry.START_DATE));
+            endDate = sdf.parse((String) contentValues.get(TermEntry.END_DATE));
+        } catch (ParseException e) {
+            Log.e(LOG_TAG, "Unable to parse dates to insert!");
+            return null;
+        }
+
+        if (startDate.after(endDate) || endDate.before(startDate)) {
+            Log.e(LOG_TAG, "Start date: " + startDate);
+            Log.e(LOG_TAG, "End Date: " + endDate);
+            Log.e(LOG_TAG, "Unable to insert term. Start and End dates do not make sense");
+            return null;
+        }
+
         long id = db.insert(TermEntry.TABLE_NAME, null, contentValues);
         if (id == -1) {
             Log.e(LOG_TAG, "Insert failed for " + uri);
@@ -232,7 +258,9 @@ public class ScheduleProvider extends ContentProvider {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor termCursor = db.query(TermEntry.TABLE_NAME, null, null, null, null, null, null);
+        Cursor termCursor = db.query(
+                TermEntry.TABLE_NAME, null, null, null, null,
+                null, null);
         while (termCursor.moveToNext()) {
             Term tempTerm = new Term();
             tempTerm.setTitle(termCursor.getString(1));
@@ -240,7 +268,7 @@ public class ScheduleProvider extends ContentProvider {
             String stringStartDate = termCursor.getString(2);
             String stringEndDate = termCursor.getString(3);
             try {
-                Date startDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringStartDate);
+                Date startDate = sdf.parse(stringStartDate);
                 tempTerm.setStartDate(startDate);
             } catch (ParseException e) {
                 Log.e(LOG_TAG, "Unable to parse start date " + stringStartDate);
@@ -248,10 +276,10 @@ public class ScheduleProvider extends ContentProvider {
                 return;
             }
             try {
-                Date endDate = new SimpleDateFormat("DD/mm/yyyy").parse(stringEndDate);
-                tempTerm.setStartDate(endDate);
+                Date endDate = sdf.parse(stringEndDate);
+                tempTerm.setEndDate(endDate);
             } catch (ParseException e) {
-                Log.e(LOG_TAG, "Unable to parse end date " + stringStartDate);
+                Log.e(LOG_TAG, "Unable to parse end date " + stringEndDate);
                 e.printStackTrace();
                 return;
             }
