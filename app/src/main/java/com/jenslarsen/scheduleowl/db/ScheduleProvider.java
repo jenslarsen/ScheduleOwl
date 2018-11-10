@@ -167,29 +167,24 @@ public class ScheduleProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Date startDate;
         Date endDate;
-        if (contentValues.get(TermEntry.TITLE) == null) {
-            Log.e(LOG_TAG, "Unable to insert term. Title cannot be null");
-            return null;
-        } else if (contentValues.get(TermEntry.START_DATE) == null) {
-            Log.e(LOG_TAG, "Unable to insert term. Start Date cannot be null");
-            return null;
-        } else if (contentValues.get(TermEntry.END_DATE) == null) {
-            Log.e(LOG_TAG, "Unable to insert term. End Date cannot be null.");
-            return null;
+        if (contentValues.getAsString(TermEntry.TITLE) == null) {
+            throw new IllegalArgumentException("Unable to insert term. Title cannot be null");
+        } else if (contentValues.getAsString(TermEntry.START_DATE) == null) {
+            throw new IllegalArgumentException("Unable to insert term. Start Date cannot be null");
+        } else if (contentValues.getAsString(TermEntry.END_DATE) == null) {
+            throw new IllegalArgumentException("Unable to insert term. End Date cannot be null.");
         }
         try {
-            startDate = sdf.parse((String) contentValues.get(TermEntry.START_DATE));
-            endDate = sdf.parse((String) contentValues.get(TermEntry.END_DATE));
+            startDate = sdf.parse(contentValues.getAsString(TermEntry.START_DATE));
+            endDate = sdf.parse(contentValues.getAsString(TermEntry.END_DATE));
         } catch (ParseException e) {
-            Log.e(LOG_TAG, "Unable to parse dates to insert!");
+            Log.e(LOG_TAG, "Unable to parse dates while inserting a new Term!");
+            e.printStackTrace();
             return null;
         }
 
         if (startDate.after(endDate) || endDate.before(startDate)) {
-            Log.e(LOG_TAG, "Start date: " + startDate);
-            Log.e(LOG_TAG, "End Date: " + endDate);
-            Log.e(LOG_TAG, "Unable to insert term. Start and End dates do not make sense");
-            return null;
+            throw new IllegalArgumentException("Unable to insert term. Start and End dates do not make sense");
         }
 
         long id = db.insert(TermEntry.TABLE_NAME, null, contentValues);
