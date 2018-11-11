@@ -430,7 +430,28 @@ public class ScheduleProvider extends ContentProvider {
      */
     @Override
     public String getType(Uri uri) {
-        return null;
+        final int match = uriMatcher.match(uri);
+
+        switch (match) {
+            case ASSESSMENT:
+                return AssessmentEntry.CONTENT_LIST_TYPE;
+            case ASSESSMENT_ID:
+                return AssessmentEntry.CONTENT_ITEM_TYPE;
+            case COURSE:
+                return CourseEntry.CONTENT_LIST_TYPE;
+            case COURSE_ID:
+                return CourseEntry.CONTENT_ITEM_TYPE;
+            case MENTOR:
+                return MentorEntry.CONTENT_LIST_TYPE;
+            case MENTOR_ID:
+                return MentorEntry.CONTENT_ITEM_TYPE;
+            case TERM:
+                return TermEntry.CONTENT_LIST_TYPE;
+            case TERM_ID:
+                return TermEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri + " with match " + match);
+        }
     }
 
     /**
