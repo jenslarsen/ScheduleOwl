@@ -110,8 +110,8 @@ public class AddTerm extends AppCompatActivity {
         String termTitle = editTextTitle.getText().toString();
         String startDate = editTextStartDate.getText().toString();
         String endDate = editTextEndDate.getText().toString();
-        if (termTitle.isEmpty()) {
-            Toast.makeText(this, "No title entered! Unable to add new term", Toast.LENGTH_SHORT).show();
+        if (termTitle.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
+            Toast.makeText(this, "Missing information! Unable to add new term", Toast.LENGTH_SHORT).show();
         } else {
             values.put(ScheduleContract.TermEntry.TITLE, termTitle);
             values.put(ScheduleContract.TermEntry.START_DATE, startDate);
