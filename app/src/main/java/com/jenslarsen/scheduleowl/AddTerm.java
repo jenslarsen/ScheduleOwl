@@ -124,7 +124,6 @@ public class AddTerm extends AppCompatActivity {
             }
 
             ScheduleProvider.updateTermsList();
-            FragmentTerms.adapter.notifyDataSetChanged();
 
             // TODO: Add code to update courses with the correct termId
         }

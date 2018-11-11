@@ -1,26 +1,29 @@
 package com.jenslarsen.scheduleowl;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.jenslarsen.scheduleowl.db.ScheduleProvider;
-import com.jenslarsen.scheduleowl.model.Term;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
 
 public class FragmentTerms extends Fragment {
 
-    public final static int ADD_TERM = 1;
-    public final static int EDIT_TERM = 2;
+    private final static int ADD_TERM = 1;
+    private final static int EDIT_TERM = 2;
 
-    public static ArrayAdapter<Term> adapter;
     private int selectedPosition;
+    private ScheduleDbHelper dbHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,10 +32,22 @@ public class FragmentTerms extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_terms, container, false);
 
-        final ListView listView = rootView.findViewById(R.id.listViewTerms);
+        ListView listView = rootView.findViewById(R.id.listViewTerms);
 
-        adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
-                R.id.textViewListItem, ScheduleProvider.terms);
+        dbHelper = new ScheduleDbHelper(getContext());
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+        String[] projection = {TermEntry._ID, TermEntry.TITLE, TermEntry.START_DATE, TermEntry.END_DATE};
+        Cursor cursor = database.query(
+                TermEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        TermCursorAdapter adapter = new TermCursorAdapter(getContext(), cursor);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -50,7 +65,6 @@ public class FragmentTerms extends Fragment {
                 buttonAddTermClicked();
             }
         });
-
         return rootView;
     }
 
