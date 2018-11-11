@@ -1,5 +1,6 @@
 package com.jenslarsen.scheduleowl.db;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -24,6 +25,17 @@ public final class ScheduleContract {
         public static final String REMINDER = "reminder";
         public static final String COURSEID = "courseId";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_ASSESSMENT);
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a list of assessments.
+         */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ASSESSMENT;
+
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a single assessment.
+         */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ASSESSMENT;
     }
 
     public static final class CourseEntry implements BaseColumns {
@@ -43,6 +55,17 @@ public final class ScheduleContract {
         public static final int DROPPED = 2;
         public static final int PLANNED = 3;
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_COURSE);
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a list of courses.
+         */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_COURSE;
+
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a single course.
+         */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_COURSE;
     }
 
     public static final class MentorEntry implements BaseColumns {
@@ -52,6 +75,17 @@ public final class ScheduleContract {
         public static final String PHONE = "phone";
         public static final String EMAIL = "email";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_MENTOR);
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a list of mentors.
+         */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MENTOR;
+
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a single mentor.
+         */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MENTOR;
     }
 
     public static final class TermEntry implements BaseColumns {
@@ -61,5 +95,16 @@ public final class ScheduleContract {
         public static final String START_DATE = "startDate";
         public static final String END_DATE = "endDate";
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_TERM);
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a list of terms.
+         */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TERM;
+
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a single term.
+         */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TERM;
     }
 }
