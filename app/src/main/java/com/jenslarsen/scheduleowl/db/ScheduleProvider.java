@@ -391,7 +391,38 @@ public class ScheduleProvider extends ContentProvider {
      */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        final int match = uriMatcher.match(uri);
+
+        switch (match) {
+            case TERM:
+                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+            case TERM_ID:
+                selection = TermEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+            case MENTOR:
+                return database.delete(MentorEntry.TABLE_NAME, selection, selectionArgs);
+            case MENTOR_ID:
+                selection = MentorEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+            case COURSE:
+                return database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+            case COURSE_ID:
+                selection = CourseEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+            case ASSESSMENT:
+                return database.delete(AssessmentEntry.TABLE_NAME, selection, selectionArgs);
+            case ASSESSMENT_ID:
+                selection = AssessmentEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Deletion is not supported for " + uri);
+        }
     }
 
     /**
