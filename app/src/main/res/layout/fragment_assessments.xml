@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_terms"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -14,7 +16,42 @@
 
     <ListView
         android:id="@+id/listViewAssessments"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
-</LinearLayout>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonAddAssessment" />
+
+    <!-- Empty view for the list -->
+    <RelativeLayout
+        android:id="@+id/empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/emptyAssessmentItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="WGU Logo"
+            android:padding="16dp"
+            android:src="@drawable/logo" />
+
+        <TextView
+            android:id="@+id/emptyAssessmentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/emptyAssessmentItem"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="16dp"
+            android:text="Assessment List is empty!" />
+
+        <TextView
+            android:id="@+id/emptyAssessmentSubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/emptyAssessmentTitle"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="8dp"
+            android:text="Click Add Assessment to start adding assessments" />
+    </RelativeLayout>
+</RelativeLayout>

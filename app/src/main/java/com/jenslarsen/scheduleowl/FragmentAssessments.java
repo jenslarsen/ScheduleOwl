@@ -29,6 +29,9 @@ public class FragmentAssessments extends Fragment {
         ArrayAdapter<Assessment> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
                 R.id.textViewListItem, ScheduleProvider.assessments);
         listView.setAdapter(adapter);
+        View emptyView = rootView.findViewById(R.id.emptyAssessmentItem);
+        listView.setAdapter(adapter);
+        listView.setEmptyView(emptyView);
 
         Button buttonAddAssessment = rootView.findViewById(R.id.buttonAddAssessment);
 

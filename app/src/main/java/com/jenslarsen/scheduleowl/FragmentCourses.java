@@ -32,6 +32,9 @@ public class FragmentCourses extends Fragment {
         ArrayAdapter<Course> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
                 R.id.textViewListItem, ScheduleProvider.courses);
         listView.setAdapter(adapter);
+        View emptyView = rootView.findViewById(R.id.emptyCourseItem);
+        listView.setAdapter(adapter);
+        listView.setEmptyView(emptyView);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

@@ -32,6 +32,9 @@ public class FragmentMentors extends Fragment {
         ArrayAdapter<Mentor> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
                 R.id.textViewListItem, ScheduleProvider.mentors);
         listView.setAdapter(adapter);
+        View emptyView = rootView.findViewById(R.id.emptyMentorItem);
+        listView.setAdapter(adapter);
+        listView.setEmptyView(emptyView);
 
         Button buttonAddMentor = rootView.findViewById(R.id.buttonAddMentor);
         buttonAddMentor.setOnClickListener(new View.OnClickListener() {
