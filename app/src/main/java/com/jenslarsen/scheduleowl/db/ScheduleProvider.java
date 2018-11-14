@@ -76,9 +76,6 @@ public class ScheduleProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         dbHelper = new ScheduleDbHelper(getContext());
-
-        updateTermsList();
-
         return true;
     }
 
@@ -140,6 +137,9 @@ public class ScheduleProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
 
         }
+
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return cursor;
     }
 
@@ -192,6 +192,9 @@ public class ScheduleProvider extends ContentProvider {
             Log.e(LOG_TAG, "Insert failed for " + uri);
             return null;
         }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -211,6 +214,8 @@ public class ScheduleProvider extends ContentProvider {
             Log.e(LOG_TAG, "Insert failed for " + uri);
             return null;
         }
+        getContext().getContentResolver().notifyChange(uri, null);
+
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -228,6 +233,9 @@ public class ScheduleProvider extends ContentProvider {
             Log.e(LOG_TAG, "Insert failed for " + uri);
             return null;
         }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -244,6 +252,9 @@ public class ScheduleProvider extends ContentProvider {
             Log.e(LOG_TAG, "Insert failed for " + uri);
             return null;
         }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -312,9 +323,9 @@ public class ScheduleProvider extends ContentProvider {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int numItemsUpdated = db.update(TermEntry.TABLE_NAME, contentValues, selection, selectionArgs);
-        if (numItemsUpdated < 1) {
-            Log.e(LOG_TAG, "Failed to update term:" + uri);
-            return -1;
+
+        if (numItemsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
         }
         return numItemsUpdated;
     }
@@ -340,6 +351,9 @@ public class ScheduleProvider extends ContentProvider {
             Log.e(LOG_TAG, "Failed to update course:" + uri);
             return -1;
         }
+        if (numItemsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return numItemsUpdated;
     }
 
@@ -363,6 +377,9 @@ public class ScheduleProvider extends ContentProvider {
             Log.e(LOG_TAG, "Failed to update course:" + uri);
             return -1;
         }
+        if (numItemsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return numItemsUpdated;
     }
 
@@ -383,6 +400,9 @@ public class ScheduleProvider extends ContentProvider {
             Log.e(LOG_TAG, "Failed to update assessment:" + uri);
             return -1;
         }
+        if (numItemsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
         return numItemsUpdated;
     }
 
@@ -393,36 +413,50 @@ public class ScheduleProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
+        int numItemsDeleted;
+
         final int match = uriMatcher.match(uri);
 
         switch (match) {
             case TERM:
-                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case TERM_ID:
                 selection = TermEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case MENTOR:
-                return database.delete(MentorEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(MentorEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case MENTOR_ID:
                 selection = MentorEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(MentorEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case COURSE:
-                return database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case COURSE_ID:
                 selection = CourseEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(CourseEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case ASSESSMENT:
-                return database.delete(AssessmentEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(AssessmentEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case ASSESSMENT_ID:
                 selection = AssessmentEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return database.delete(TermEntry.TABLE_NAME, selection, selectionArgs);
+                numItemsDeleted = database.delete(AssessmentEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
+        if (numItemsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return numItemsDeleted;
     }
 
     /**
@@ -451,43 +485,6 @@ public class ScheduleProvider extends ContentProvider {
                 return TermEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri + " with match " + match);
-        }
-    }
-
-    /**
-     * Update the list of terms from the database
-     */
-    public static void updateTermsList() {
-        terms.clear();
-
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        Cursor termCursor = db.query(
-                TermEntry.TABLE_NAME, null, null, null, null,
-                null, null);
-        while (termCursor.moveToNext()) {
-            Term tempTerm = new Term();
-            tempTerm.setTitle(termCursor.getString(1));
-
-            String stringStartDate = termCursor.getString(2);
-            String stringEndDate = termCursor.getString(3);
-            try {
-                Date startDate = sdf.parse(stringStartDate);
-                tempTerm.setStartDate(startDate);
-            } catch (ParseException e) {
-                Log.e(LOG_TAG, "Unable to parse start date " + stringStartDate);
-                e.printStackTrace();
-                return;
-            }
-            try {
-                Date endDate = sdf.parse(stringEndDate);
-                tempTerm.setEndDate(endDate);
-            } catch (ParseException e) {
-                Log.e(LOG_TAG, "Unable to parse end date " + stringEndDate);
-                e.printStackTrace();
-                return;
-            }
-            terms.add(tempTerm);
         }
     }
 }
