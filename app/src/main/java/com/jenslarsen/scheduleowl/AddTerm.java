@@ -122,9 +122,6 @@ public class AddTerm extends AppCompatActivity {
                 Toast.makeText(this, "Insert Term Failed!", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            ScheduleProvider.updateTermsList();
-
             // TODO: Add code to update courses with the correct termId
         }
         finish();

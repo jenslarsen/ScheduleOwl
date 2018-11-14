@@ -2,12 +2,12 @@ package com.jenslarsen.scheduleowl;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,44 +17,29 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
-import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
 
 public class FragmentTerms extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static int ADD_TERM = 1;
     private final static int EDIT_TERM = 2;
+    public static final int TERM_LOADER = 1000;
 
     private int selectedPosition;
-    private ScheduleDbHelper dbHelper;
+    private TermCursorAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        TermCursorAdapter adapter;
-        Cursor cursor;
-
         View rootView = inflater.inflate(R.layout.fragment_terms, container, false);
 
         ListView listView = rootView.findViewById(R.id.listViewTerms);
 
-        dbHelper = new ScheduleDbHelper(getContext());
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
-        String[] projection = {TermEntry._ID, TermEntry.TITLE, TermEntry.START_DATE, TermEntry.END_DATE};
-        cursor = database.query(
-                TermEntry.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        adapter = new TermCursorAdapter(getContext(), cursor);
-        View emptyView = rootView.findViewById(R.id.emptyTermItem);
+        adapter = new TermCursorAdapter(getContext(), null);
         listView.setAdapter(adapter);
+
+        View emptyView = rootView.findViewById(R.id.emptyTermView);
         listView.setEmptyView(emptyView);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,6 +57,9 @@ public class FragmentTerms extends Fragment implements LoaderManager.LoaderCallb
                 buttonAddTermClicked();
             }
         });
+
+        getLoaderManager().initLoader(TERM_LOADER, null, this);
+
         return rootView;
     }
 
@@ -89,16 +77,28 @@ public class FragmentTerms extends Fragment implements LoaderManager.LoaderCallb
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-        return null;
+        String[] projection = new String[]{
+                TermEntry._ID,
+                TermEntry.TITLE,
+                TermEntry.START_DATE};
+
+        return new CursorLoader(
+                getContext(),
+                TermEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-
+        adapter.swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 }
 

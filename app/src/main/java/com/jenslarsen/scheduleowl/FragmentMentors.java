@@ -32,7 +32,7 @@ public class FragmentMentors extends Fragment {
         ArrayAdapter<Mentor> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_tab,
                 R.id.textViewListItem, ScheduleProvider.mentors);
         listView.setAdapter(adapter);
-        View emptyView = rootView.findViewById(R.id.emptyMentorItem);
+        View emptyView = rootView.findViewById(R.id.emptyMentorView);
         listView.setAdapter(adapter);
         listView.setEmptyView(emptyView);
 
