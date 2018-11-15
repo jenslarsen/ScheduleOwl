@@ -1,11 +1,14 @@
 package com.jenslarsen.scheduleowl;
 
-import android.content.Intent;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 
 public class AddMentor extends AppCompatActivity {
 
@@ -16,17 +19,28 @@ public class AddMentor extends AppCompatActivity {
     }
 
     public void buttonSaveClicked(View view) {
-        Intent intent = new Intent();
+        ContentValues values = new ContentValues();
 
         EditText editTextName = findViewById(R.id.editTextName);
+        EditText editTextPhone = findViewById(R.id.editTextPhone);
+        EditText editTextEmail = findViewById(R.id.editTextEmail);
+
         String mentorName = editTextName.getText().toString();
+        String mentorPhone = editTextPhone.getText().toString();
+        String mentorEmail = editTextEmail.getText().toString();
+
         if (mentorName.isEmpty()) {
-            Toast.makeText(this, "No name entered! Unable to add new mentor",
-                    Toast.LENGTH_SHORT).show();
-            setResult(RESULT_CANCELED);
+            Toast.makeText(this, "Missing information! Unable to add new mentor", Toast.LENGTH_SHORT).show();
         } else {
-            intent.putExtra("mentorName", mentorName);
-            setResult(RESULT_OK, intent);
+            values.put(ScheduleContract.MentorEntry.NAME, mentorName);
+            values.put(ScheduleContract.MentorEntry.PHONE, mentorPhone);
+            values.put(ScheduleContract.MentorEntry.EMAIL, mentorEmail);
+
+            Uri newUri = getContentResolver().insert(ScheduleContract.MentorEntry.CONTENT_URI, values);
+            if (newUri == null) {
+                Toast.makeText(this, "Insert Mentor Failed!", Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
         finish();
     }
