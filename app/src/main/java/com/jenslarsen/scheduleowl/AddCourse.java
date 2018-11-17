@@ -1,7 +1,8 @@
 package com.jenslarsen.scheduleowl;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 
 import java.text.SimpleDateFormat;
@@ -18,29 +20,26 @@ import java.util.Locale;
 
 public class AddCourse extends AppCompatActivity {
 
-    AssessmentChooserAdapter adapter;
+    CourseChooserAdapter adapter;
 
-    public EditText editTextStartDate;
-    public EditText editTextEndDate;
-    public EditText editTextTitle;
+    private EditText editTextStartDate;
+    private EditText editTextEndDate;
 
-    public Calendar calendar;
-    DatePickerDialog.OnDateSetListener startDatePicker;
-    DatePickerDialog.OnDateSetListener endDatePicker;
+    private String dateFormat = "yyyy-MM-dd";
+
+    private Calendar calendar;
+    private DatePickerDialog.OnDateSetListener startDatePicker;
+    private DatePickerDialog.OnDateSetListener endDatePicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_course);
 
-        editTextTitle = findViewById(R.id.editTextTitle);
-        editTextStartDate = findViewById(R.id.editTextStartDate);
-        editTextEndDate = findViewById(R.id.editTextEndDate);
-
         // set up array adapter
         final ListView listView = findViewById(R.id.listViewAssessments);
 
-        adapter = new AssessmentChooserAdapter(this, ScheduleProvider.assessments);
+        adapter = new CourseChooserAdapter(this, ScheduleProvider.courses);
         listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();
@@ -93,50 +92,42 @@ public class AddCourse extends AppCompatActivity {
     }
 
     private void updateStartDate() {
-        String dateFormat = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
         editTextStartDate.setText(sdf.format(calendar.getTime()));
     }
 
     private void updateEndDate() {
-        String dateFormat = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
         editTextEndDate.setText(sdf.format(calendar.getTime()));
     }
 
     public void buttonSaveClicked(View view) {
-        Intent intent = new Intent();
+        ContentValues values = new ContentValues();
 
+        EditText editTextTitle = findViewById(R.id.editTextTitle);
+        editTextStartDate = findViewById(R.id.editTextStartDate);
+        editTextEndDate = findViewById(R.id.editTextEndDate);
         String courseTitle = editTextTitle.getText().toString();
         String startDate = editTextStartDate.getText().toString();
         String endDate = editTextEndDate.getText().toString();
-        if (courseTitle.isEmpty()) {
-            Toast.makeText(this,
-                    "No title entered! Unable to add new course", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_CANCELED);
+        if (courseTitle.isEmpty() || startDate.isEmpty() || endDate.isEmpty()) {
+            Toast.makeText(this, "Missing information! Unable to add new course", Toast.LENGTH_SHORT).show();
         } else {
-            intent.putExtra("courseTitle", courseTitle);
-            intent.putExtra("startDate", startDate);
-            intent.putExtra("endDate", endDate);
-            intent.putExtra("selectedCourses", adapter.getSelectedAssessments());
-            setResult(RESULT_OK, intent);
+            values.put(ScheduleContract.CourseEntry.TITLE, courseTitle);
+            values.put(ScheduleContract.CourseEntry.START_DATE, startDate);
+            values.put(ScheduleContract.CourseEntry.END_DATE, endDate);
+
+            Uri newUri = getContentResolver().insert(ScheduleContract.CourseEntry.CONTENT_URI, values);
+            if (newUri == null) {
+                Toast.makeText(this, "Insert Course Failed!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // TODO: Add code to update courses with the correct courseId
         }
         finish();
     }
 
     public void buttonCancelClicked(View view) {
         finish();
-    }
-
-    public void buttonShareNotesClicked(View view) {
-        EditText editTextNotes = findViewById(R.id.editTextNotes);
-        String notes = editTextNotes.getText().toString();
-
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT, editTextTitle.getText().toString() + ": "
-                + notes);
-        intent.setType("text/plain");
-        startActivity(Intent.createChooser(intent, editTextTitle.getText().toString()));
     }
 }

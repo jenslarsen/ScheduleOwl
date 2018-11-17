@@ -1,52 +1,76 @@
 package com.jenslarsen.scheduleowl;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.ScheduleProvider;
+import com.jenslarsen.scheduleowl.model.Course;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class EditCourse extends AppCompatActivity {
 
-    AssessmentChooserAdapter adapter;
+    private int selectedPosition;
+    Intent intent = new Intent();
+    CourseChooserAdapter adapter;
+    private Calendar calendar;
+    private TextView editTextStartDate;
+    private DatePickerDialog.OnDateSetListener startDatePicker;
+    private TextView editTextEndDate;
+    private DatePickerDialog.OnDateSetListener endDatePicker;
 
-    public EditText editTextStartDate;
-    public EditText editTextEndDate;
-    public EditText editTextTitle;
+    private static Course currentCourse;
 
-    public Calendar calendar;
-    DatePickerDialog.OnDateSetListener startDatePicker;
-    DatePickerDialog.OnDateSetListener endDatePicker;
+    private String dateFormat = "yyyy-MM-dd";
+
+    private SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_course);
 
-        editTextTitle = findViewById(R.id.editTextTitle);
-        editTextStartDate = findViewById(R.id.editTextStartDate);
+        Bundle bundle = getIntent().getExtras();
+        selectedPosition = bundle.getInt("selectedPosition");
+        currentCourse = ScheduleProvider.courses.get(selectedPosition);
+        EditText editTextTitle = findViewById(R.id.editTextTitle);
+        editTextTitle.setText(currentCourse.getTitle());
+
         editTextEndDate = findViewById(R.id.editTextEndDate);
+        editTextStartDate = findViewById(R.id.editTextStartDate);
+
+        Date startDate = currentCourse.getStartDate();
+        if (startDate != null) {
+            editTextStartDate.setText(sdf.format(startDate));
+        }
+
+        Date endDate = currentCourse.getEndDate();
+        if (endDate != null) {
+            editTextEndDate.setText(sdf.format(endDate));
+        }
 
         // set up array adapter
-        final ListView listView = findViewById(R.id.listViewAssessments);
-
-        adapter = new AssessmentChooserAdapter(this, ScheduleProvider.assessments);
+        ListView listView = findViewById(R.id.listViewCourses);
+        adapter = new CourseChooserAdapter(this, ScheduleProvider.courses);
         listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();
 
         // set up start date picker
-        editTextStartDate = findViewById(R.id.editTextStartDate);
+        // TODO: Fix date picker so it shows the date from the current course
         startDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -69,7 +93,7 @@ public class EditCourse extends AppCompatActivity {
         });
 
         // set up end date picker
-        editTextEndDate = findViewById(R.id.editTextEndDate);
+        // TODO: Fix date picker so it shows the date from the current course
         endDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -92,33 +116,17 @@ public class EditCourse extends AppCompatActivity {
         });
     }
 
-    private void updateStartDate() {
-        String dateFormat = "MM/dd/yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
-        editTextStartDate.setText(sdf.format(calendar.getTime()));
-    }
-
-    private void updateEndDate() {
-        String dateFormat = "MM/dd/yyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
-        editTextEndDate.setText(sdf.format(calendar.getTime()));
-    }
-
     public void buttonSaveClicked(View view) {
         Intent intent = new Intent();
 
+        EditText editTextTitle = findViewById(R.id.editTextTitle);
+        editTextStartDate = findViewById(R.id.editTextStartDate);
         String courseTitle = editTextTitle.getText().toString();
-        String startDate = editTextStartDate.getText().toString();
-        String endDate = editTextEndDate.getText().toString();
         if (courseTitle.isEmpty()) {
-            Toast.makeText(this,
-                    "No title entered! Unable to add new course", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No title entered! Unable to update course", Toast.LENGTH_SHORT).show();
             setResult(RESULT_CANCELED);
         } else {
-            intent.putExtra("courseTitle", courseTitle);
-            intent.putExtra("startDate", startDate);
-            intent.putExtra("endDate", endDate);
-            intent.putExtra("selectedCourses", adapter.getSelectedAssessments());
+            intent.putExtra("selectedCourses", adapter.getSelectedCourses());
             setResult(RESULT_OK, intent);
         }
         finish();
@@ -129,18 +137,31 @@ public class EditCourse extends AppCompatActivity {
     }
 
     public void buttonDeleteClicked(View view) {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Course")
+                .setMessage("Are you sure?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        removeCourse();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
+    }
+
+    private void removeCourse() {
+        intent.putExtra("deleteCourse", true);
+        setResult(RESULT_OK, intent);
         finish();
     }
 
-    public void buttonShareNotesClicked(View view) {
-        EditText editTextNotes = findViewById(R.id.editTextNotes);
-        String notes = editTextNotes.getText().toString();
+    private void updateStartDate() {
+        editTextStartDate.setText(sdf.format(calendar.getTime()));
+    }
 
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT, editTextTitle.getText().toString() + ": "
-                + notes);
-        intent.setType("text/plain");
-        startActivity(Intent.createChooser(intent, editTextTitle.getText().toString()));
+    private void updateEndDate() {
+        editTextEndDate.setText(sdf.format(calendar.getTime()));
     }
 }
