@@ -44,7 +44,7 @@
             android:layout_weight="10"
             android:ems="10"
             android:focusable="false"
-            android:hint="@string/mm_dd_yyyy"
+            android:hint="@string/date_prompt"
             android:inputType="date" />
 
         <TextView
@@ -78,7 +78,7 @@
             android:clickable="false"
             android:ems="10"
             android:focusable="false"
-            android:hint="@string/mm_dd_yyyy"
+            android:hint="@string/date_prompt"
             android:inputType="date" />
 
         <TextView

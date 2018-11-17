@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -13,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
@@ -50,7 +50,7 @@ public class FragmentAssessments extends Fragment implements LoaderManager.Loade
             }
         });
 
-        Button buttonAddAssessment = rootView.findViewById(R.id.buttonAddAssessment);
+        FloatingActionButton buttonAddAssessment = rootView.findViewById(R.id.buttonAddAssessment);
         buttonAddAssessment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

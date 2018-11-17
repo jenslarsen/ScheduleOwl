@@ -11,7 +11,7 @@
         android:id="@+id/textViewAddTerm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Edit Term"
+        android:text="@string/edit_term"
         android:textColor="@android:color/black"
         android:textSize="24sp" />
 
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Enter Term Title"
+        android:hint="@string/enter_term_title"
         android:importantForAutofill="no"
         android:inputType="textPersonName" />
 
@@ -43,7 +43,7 @@
         android:clickable="true"
         android:ems="10"
         android:focusable="false"
-        android:hint="MM/DD/YYYY"
+        android:hint="@string/date_prompt"
         android:importantForAutofill="no"
         android:inputType="date" />
 
@@ -60,7 +60,7 @@
         android:clickable="false"
         android:ems="10"
         android:focusable="false"
-        android:hint="MM/DD/YYYY"
+        android:hint="@string/date_prompt"
         android:importantForAutofill="no"
         android:inputType="date" />
 
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="buttonCancelClicked"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
         <Button
             android:id="@+id/buttonDelete"
@@ -96,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="buttonDeleteClicked"
-            android:text="Delete" />
+            android:text="@string/delete" />
 
         <Button
             android:id="@+id/buttonSave"
@@ -104,6 +104,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="buttonSaveClicked"
-            android:text="Save" />
+            android:text="@string/save" />
     </LinearLayout>
 </LinearLayout>

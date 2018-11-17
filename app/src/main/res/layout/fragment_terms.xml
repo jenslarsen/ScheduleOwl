@@ -8,17 +8,22 @@
     android:orientation="vertical"
     tools:context=".FragmentTerms">
 
-    <Button
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/buttonAddTerm"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add"
         android:text="@string/add_term" />
 
     <ListView
         android:id="@+id/listViewTerms"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/buttonAddTerm" />
+        android:layout_height="wrap_content" />
 
     <!-- Empty view for the list -->
     <RelativeLayout
@@ -32,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:contentDescription="WGU Logo"
+            android:contentDescription="@string/wgu_logo"
             android:padding="16dp"
             android:src="@drawable/logo" />
 
@@ -43,7 +48,7 @@
             android:layout_below="@+id/emptyTermItem"
             android:layout_centerHorizontal="true"
             android:paddingTop="16dp"
-            android:text="Term List is empty!" />
+            android:text="@string/empty_list" />
 
         <TextView
             android:id="@+id/emptyTermSubTitle"
@@ -52,6 +57,6 @@
             android:layout_below="@+id/emptyTermTitle"
             android:layout_centerHorizontal="true"
             android:paddingTop="8dp"
-            android:text="Click Add Term to start adding terms" />
+            android:text="@string/add_items" />
     </RelativeLayout>
 </RelativeLayout>

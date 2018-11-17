@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit Course"
+        android:text="@string/edit_course"
         android:textColor="@android:color/black"
         android:textSize="24sp" />
 
@@ -44,7 +44,7 @@
             android:layout_weight="10"
             android:ems="10"
             android:focusable="false"
-            android:hint="@string/mm_dd_yyyy"
+            android:hint="@string/date_prompt"
             android:inputType="date" />
 
         <TextView
@@ -78,7 +78,7 @@
             android:clickable="false"
             android:ems="10"
             android:focusable="false"
-            android:hint="@string/mm_dd_yyyy"
+            android:hint="@string/date_prompt"
             android:inputType="date" />
 
         <TextView

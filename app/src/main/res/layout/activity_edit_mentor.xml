@@ -10,14 +10,14 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Edit Mentor"
+        android:text="@string/edit_mentor"
         android:textColor="@android:color/black"
         android:textSize="24sp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Name" />
+        android:text="@string/name" />
 
     <EditText
         android:id="@+id/editTextName"
@@ -30,7 +30,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Phone" />
+        android:text="@string/phone" />
 
     <EditText
         android:id="@+id/editTextPhone"
@@ -42,7 +42,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Email" />
+        android:text="@string/email" />
 
     <EditText
         android:id="@+id/editTextEmail"
@@ -54,7 +54,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_gravity="bottom"
         android:layout_weight="1"
         android:gravity="bottom"
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="10"
             android:onClick="buttonDeleteClicked"
-            android:text="Delete" />
+            android:text="@string/delete" />
 
         <Button
             android:id="@+id/buttonSave"

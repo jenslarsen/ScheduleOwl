@@ -28,7 +28,7 @@
         android:ems="10"
         android:importantForAutofill="no"
         android:inputType="textPersonName"
-        android:hint="Enter Term Title"/>
+        android:hint="@string/enter_term_title"/>
 
     <TextView
         android:id="@+id/textViewStartDate"
@@ -43,7 +43,7 @@
         android:clickable="true"
         android:ems="10"
         android:focusable="false"
-        android:hint="MM/DD/YYYY"
+        android:hint="@string/date_prompt"
         android:importantForAutofill="no"
         android:inputType="date" />
 
@@ -60,7 +60,7 @@
         android:clickable="false"
         android:ems="10"
         android:focusable="false"
-        android:hint="MM/DD/YYYY"
+        android:hint="@string/date_prompt"
         android:importantForAutofill="no"
         android:inputType="date" />
 

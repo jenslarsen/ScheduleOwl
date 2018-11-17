@@ -11,7 +11,7 @@
         android:id="@+id/textViewAddAssessment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add New Assessment"
+        android:text="@string/add_new_assessment"
         android:textColor="@android:color/black"
         android:textSize="24sp" />
 
@@ -27,13 +27,13 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:hint="Enter Assessment Title"/>
+        android:hint="@string/enter_assessment_title"/>
 
     <TextView
         android:id="@+id/textViewDueDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Due Date" />
+        android:text="@string/due_date" />
 
     <EditText
         android:id="@+id/editTextDueDate"
@@ -42,12 +42,12 @@
         android:clickable="true"
         android:ems="10"
         android:focusable="false"
-        android:hint="MM/DD/YYYY"
+        android:hint="@string/date_prompt"
         android:inputType="date" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_gravity="bottom"
         android:layout_weight="1"
         android:gravity="bottom"
