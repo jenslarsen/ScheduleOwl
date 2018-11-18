@@ -9,9 +9,6 @@
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="select_courses">Select Courses</string>
-    <string name="save">Save</string>
-    <string name="enter_term_title">Enter Term Title</string>
-    <string name="cancel">Cancel</string>
     <string name="chooser_item">Chooser Item</string>
     <string name="add_new_course">Add New Course</string>
     <string name="enter_course_title">Enter Course Title</string>
@@ -26,13 +23,8 @@
     <string name="wgu_logo">WGU Logo</string>
     <string name="date_prompt">YYYY-MM-DD</string>
     <string name="add_new_assessment">Add New Assessment</string>
-    <string name="enter_assessment_title">Enter Assessment Title</string>
     <string name="due_date">Due Date</string>
     <string name="add_new_mentor">Add New Mentor</string>
-    <string name="name">Name</string>
-    <string name="phone">Phone</string>
-    <string name="email">Email</string>
-    <string name="enter_term_title">Enter Term Title</string>
     <string name="edit_new_assessment">Edit New Assessment</string>
     <string name="enter_assessment_title">Enter Assessment Title</string>
     <string name="edit_course">Edit Course</string>
@@ -44,6 +36,5 @@
     <string name="edit_term">Edit Term</string>
     <string name="enter_term_title">Enter Term Title</string>
     <string name="cancel">Cancel</string>
-    <string name="delete">Delete</string>
     <string name="save">Save</string>
 </resources>
