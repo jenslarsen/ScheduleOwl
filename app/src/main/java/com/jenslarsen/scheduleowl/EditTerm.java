@@ -1,65 +1,76 @@
 package com.jenslarsen.scheduleowl;
 
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleProvider;
-import com.jenslarsen.scheduleowl.model.Term;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
-public class EditTerm extends AppCompatActivity {
+public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private int selectedPosition;
-    Intent intent = new Intent();
     CourseChooserAdapter adapter;
     private Calendar calendar;
-    private TextView editTextStartDate;
     private DatePickerDialog.OnDateSetListener startDatePicker;
-    private TextView editTextEndDate;
     private DatePickerDialog.OnDateSetListener endDatePicker;
-
-    private static Term currentTerm;
+    private Uri currentTermUri;
+    private EditText editTextTitle;
+    private EditText editTextStartDate;
+    private EditText editTextEndDate;
 
     private String dateFormat = "yyyy-MM-dd";
 
     private SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
+
+    public EditTerm() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_term);
 
-        Bundle bundle = getIntent().getExtras();
-        selectedPosition = bundle.getInt("selectedPosition");
-        currentTerm = ScheduleProvider.terms.get(selectedPosition);
-        EditText editTextTitle = findViewById(R.id.editTextTitle);
-        editTextTitle.setText(currentTerm.getTitle());
+        Intent intent = getIntent();
+        currentTermUri = intent.getData();
 
+        Button deleteButton = findViewById(R.id.buttonDelete);
+        TextView textViewAddTerm = findViewById(R.id.textViewAddTerm);
+        editTextTitle = findViewById(R.id.editTextTitle);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
 
-        Date startDate = currentTerm.getStartDate();
-        if (startDate != null) {
-            editTextStartDate.setText(sdf.format(startDate));
-        }
-
-        Date endDate = currentTerm.getEndDate();
-        if (endDate != null) {
-            editTextEndDate.setText(sdf.format(endDate));
+        if (currentTermUri == null) {
+            // No Uri so we must be adding a pet
+            textViewAddTerm.setText(getString(R.string.add_new_term));
+            deleteButton.setVisibility(View.GONE);
+        } else {
+            textViewAddTerm.setText(getString(R.string.edit_term));
+            int EDIT_TERM = 1000;
+            getSupportLoaderManager().initLoader(EDIT_TERM, null, this);
         }
 
         // set up array adapter
@@ -117,20 +128,47 @@ public class EditTerm extends AppCompatActivity {
     }
 
     public void buttonSaveClicked(View view) {
-        Intent intent = new Intent();
 
-        EditText editTextTitle = findViewById(R.id.editTextTitle);
-        editTextStartDate = findViewById(R.id.editTextStartDate);
-        String termTitle = editTextTitle.getText().toString();
-        if (termTitle.isEmpty()) {
-            Toast.makeText(this, "No title entered! Unable to update term", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_CANCELED);
+        // get input from fields
+        String title = editTextTitle.getText().toString().trim();
+        String start = editTextStartDate.getText().toString().trim();
+        String end = editTextEndDate.getText().toString().trim();
+
+        if (currentTermUri == null
+                && TextUtils.isEmpty(title)
+                && TextUtils.isEmpty(start)
+                && TextUtils.isEmpty(end)) {
+            // nothing entered, nothing to do
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(TermEntry.TITLE, title);
+        values.put(TermEntry.START_DATE, start);
+        values.put(TermEntry.END_DATE, end);
+
+        // if this is a new term the Uri will be null
+        if (currentTermUri == null) {
+            Uri newUri = getContentResolver().insert(TermEntry.CONTENT_URI, values);
+
+            if (newUri == null) {
+                Toast.makeText(this, getString(R.string.insert_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.insert_successful), Toast.LENGTH_SHORT).show();
+            }
         } else {
-            intent.putExtra("selectedCourses", adapter.getSelectedCourses());
-            setResult(RESULT_OK, intent);
+            // existing term
+            int rowsChanged = getContentResolver().update(currentTermUri, values, null, null);
+
+            if (rowsChanged == 0) {
+                Toast.makeText(this, getString(R.string.update_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.update_successful), Toast.LENGTH_SHORT).show();
+            }
         }
         finish();
     }
+
 
     public void buttonCancelClicked(View view) {
         finish();
@@ -145,15 +183,26 @@ public class EditTerm extends AppCompatActivity {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        removeTerm();
+                        deleteTerm();
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
-    private void removeTerm() {
-        intent.putExtra("deleteTerm", true);
-        setResult(RESULT_OK, intent);
+    private void deleteTerm() {
+
+        // only delete if this is an existing term
+        if (currentTermUri != null) {
+            int numTermsRemoved = getContentResolver().delete(currentTermUri, null, null);
+
+            if (numTermsRemoved == 0) {
+                Toast.makeText(this, getString(R.string.delete_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.delete_successful), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
         finish();
     }
 
@@ -163,5 +212,54 @@ public class EditTerm extends AppCompatActivity {
 
     private void updateEndDate() {
         editTextEndDate.setText(sdf.format(calendar.getTime()));
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
+        String[] projection = new String[]{
+                TermEntry._ID,
+                TermEntry.TITLE,
+                TermEntry.START_DATE,
+                TermEntry.END_DATE
+        };
+
+        return new CursorLoader(
+                this,
+                TermEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+
+        // if the cursor is empty, nothing to do
+        if (cursor == null || cursor.getCount() < 1) {
+            return;
+        }
+
+        if (cursor.moveToFirst()) {
+            int titleIndex = cursor.getColumnIndex(TermEntry.TITLE);
+            int startIndex = cursor.getColumnIndex(TermEntry.START_DATE);
+            int endIndex = cursor.getColumnIndex(TermEntry.END_DATE);
+
+            String title = cursor.getString(titleIndex);
+            String start = cursor.getString(startIndex);
+            String end = cursor.getString(endIndex);
+
+            editTextTitle.setText(title);
+            editTextStartDate.setText(start);
+            editTextEndDate.setText(end);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        editTextTitle.setText("");
+        editTextStartDate.setText("");
+        editTextEndDate.setText("");
     }
 }

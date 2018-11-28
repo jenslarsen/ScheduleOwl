@@ -1,7 +1,9 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,18 +16,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 
 public class FragmentTerms extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static int ADD_TERM = 1;
-    private final static int EDIT_TERM = 2;
     public static final int TERM_LOADER = 1000;
 
-    private int selectedPosition;
     private TermCursorAdapter adapter;
 
     @Override
@@ -46,8 +44,10 @@ public class FragmentTerms extends Fragment implements LoaderManager.LoaderCallb
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedPosition = position;
-                termItemClicked(selectedPosition);
+                Intent intent = new Intent(getActivity(), EditTerm.class);
+                Uri currentTermUri = ContentUris.withAppendedId(TermEntry.CONTENT_URI, id);
+                intent.setData(currentTermUri);
+                startActivity(intent);
             }
         });
 
@@ -65,14 +65,8 @@ public class FragmentTerms extends Fragment implements LoaderManager.LoaderCallb
     }
 
     public void buttonAddTermClicked() {
-        Intent intent = new Intent(getActivity(), AddTerm.class);
-        startActivityForResult(intent, ADD_TERM);
-    }
-
-    public void termItemClicked(int selectedPosition) {
         Intent intent = new Intent(getActivity(), EditTerm.class);
-        intent.putExtra("selectedPosition", selectedPosition);
-        startActivityForResult(intent, EDIT_TERM);
+        startActivity(intent);
     }
 
     @NonNull
