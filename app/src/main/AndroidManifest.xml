@@ -19,13 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddTerm" />
         <activity android:name=".EditTerm" />
-        <activity android:name=".AddCourse" />
         <activity android:name=".EditCourse" />
-        <activity android:name=".AddMentor" />
         <activity android:name=".EditMentor" />
-        <activity android:name=".AddAssessment" />
         <activity android:name=".EditAssessment" />
 
         <provider
