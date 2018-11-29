@@ -1,7 +1,9 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
 
 public class FragmentAssessments extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -45,8 +48,10 @@ public class FragmentAssessments extends Fragment implements LoaderManager.Loade
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedPosition = position;
-                assessmentItemClicked(selectedPosition);
+                Intent intent = new Intent(getActivity(), EditAssessment.class);
+                Uri currentTermUri = ContentUris.withAppendedId(ScheduleContract.AssessmentEntry.CONTENT_URI, id);
+                intent.setData(currentTermUri);
+                startActivity(intent);
             }
         });
 
@@ -64,7 +69,8 @@ public class FragmentAssessments extends Fragment implements LoaderManager.Loade
     }
 
     public void buttonAddAssessmentClicked() {
-        Intent intent = new Intent(getActivity(), AddAssessment.class);
+        Intent intent = new Intent(getActivity(), EditAssessment.class);
+        startActivity(intent);
         startActivityForResult(intent, ADD_ASSESSMENT);
     }
 
