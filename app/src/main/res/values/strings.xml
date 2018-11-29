@@ -37,4 +37,11 @@
     <string name="enter_term_title">Enter Term Title</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="delete_failed">Delete failed!</string>
+    <string name="delete_successful">Delete successful!</string>
+    <string name="insert_failed">Insert failed!</string>
+    <string name="insert_successful">Insert successful!</string>
+    <string name="update_failed">Update failed!</string>
+    <string name="update_successful">Update successful!</string>
+    <string name="edit_assessment">Edit Assessment</string>
 </resources>
