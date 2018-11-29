@@ -40,6 +40,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     private EditText editTextTitle;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
+    private EditText editTextNotes;
 
     private String dateFormat = "yyyy-MM-dd";
 
@@ -61,6 +62,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
+        editTextNotes = findViewById(R.id.editTextNotes);
 
         if (currentCourseUri == null) {
             // No Uri so we must be adding a pet
@@ -260,5 +262,16 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         editTextTitle.setText("");
         editTextStartDate.setText("");
         editTextEndDate.setText("");
+    }
+
+    public void buttonShareNotesClicked(View view) {
+        Intent notesIntent = new Intent();
+        notesIntent.setAction(Intent.ACTION_SEND);
+        notesIntent.putExtra(Intent.EXTRA_TEXT,
+                editTextTitle.getText().toString().trim() + ": "
+                        + editTextNotes.getText().toString().trim());
+        notesIntent.setType("text/plain");
+        startActivity(Intent.createChooser(notesIntent, getResources().getText(R.string.send_to)));
+
     }
 }
