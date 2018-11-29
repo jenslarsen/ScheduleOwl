@@ -1,7 +1,9 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,11 +19,11 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
 
 public class FragmentMentors extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static int ADD_MENTOR = 1;
     private final static int EDIT_MENTOR = 2;
     public static final int MENTOR_LOADER = 1000;
 
@@ -46,8 +48,10 @@ public class FragmentMentors extends Fragment implements LoaderManager.LoaderCal
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedPosition = position;
-                mentorItemClicked(selectedPosition);
+                Intent intent = new Intent(getActivity(), EditMentor.class);
+                Uri currentMentorUri = ContentUris.withAppendedId(ScheduleContract.MentorEntry.CONTENT_URI, id);
+                intent.setData(currentMentorUri);
+                startActivity(intent);
             }
         });
 
@@ -65,8 +69,8 @@ public class FragmentMentors extends Fragment implements LoaderManager.LoaderCal
     }
 
     public void buttonAddMentorClicked() {
-        Intent intent = new Intent(getActivity(), AddMentor.class);
-        startActivityForResult(intent, ADD_MENTOR);
+        Intent intent = new Intent(getActivity(), EditMentor.class);
+        startActivity(intent);
     }
 
     public void mentorItemClicked(int selectedPosition) {

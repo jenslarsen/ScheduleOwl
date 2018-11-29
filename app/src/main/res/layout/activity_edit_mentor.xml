@@ -8,6 +8,7 @@
     tools:context=".EditMentor">
 
     <TextView
+        android:id="@+id/textViewAddMentor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/edit_mentor"

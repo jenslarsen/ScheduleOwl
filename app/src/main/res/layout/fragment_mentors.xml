@@ -17,7 +17,7 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@drawable/icon_add"
         android:text="@string/add_mentor" />
 
     <ListView
