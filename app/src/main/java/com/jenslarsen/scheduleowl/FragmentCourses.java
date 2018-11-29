@@ -1,7 +1,9 @@
 package com.jenslarsen.scheduleowl;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 
 public class FragmentCourses extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -46,8 +49,10 @@ public class FragmentCourses extends Fragment implements LoaderManager.LoaderCal
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedPosition = position;
-                courseItemClicked(selectedPosition);
+                Intent intent = new Intent(getActivity(), EditCourse.class);
+                Uri currentCourseUri = ContentUris.withAppendedId(ScheduleContract.CourseEntry.CONTENT_URI, id);
+                intent.setData(currentCourseUri);
+                startActivity(intent);
             }
         });
 
@@ -65,14 +70,8 @@ public class FragmentCourses extends Fragment implements LoaderManager.LoaderCal
     }
 
     public void buttonAddCourseClicked() {
-        Intent intent = new Intent(getActivity(), AddCourse.class);
-        startActivityForResult(intent, ADD_COURSE);
-    }
-
-    public void courseItemClicked(int selectedPosition) {
         Intent intent = new Intent(getActivity(), EditCourse.class);
-        intent.putExtra("selectedPosition", selectedPosition);
-        startActivityForResult(intent, EDIT_COURSE);
+        startActivity(intent);
     }
 
     @NonNull

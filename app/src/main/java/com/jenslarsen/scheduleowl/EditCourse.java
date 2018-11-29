@@ -1,70 +1,80 @@
 package com.jenslarsen.scheduleowl;
 
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleProvider;
-import com.jenslarsen.scheduleowl.model.Course;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
-public class EditCourse extends AppCompatActivity {
+public class EditCourse extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private int selectedPosition;
-    Intent intent = new Intent();
-    CourseChooserAdapter adapter;
+    AssessmentChooserAdapter adapter;
     private Calendar calendar;
-    private TextView editTextStartDate;
     private DatePickerDialog.OnDateSetListener startDatePicker;
-    private TextView editTextEndDate;
     private DatePickerDialog.OnDateSetListener endDatePicker;
-
-    private static Course currentCourse;
+    private Uri currentCourseUri;
+    private EditText editTextTitle;
+    private EditText editTextStartDate;
+    private EditText editTextEndDate;
 
     private String dateFormat = "yyyy-MM-dd";
 
     private SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
+
+    public EditCourse() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_course);
 
-        Bundle bundle = getIntent().getExtras();
-        selectedPosition = bundle.getInt("selectedPosition");
-        currentCourse = ScheduleProvider.courses.get(selectedPosition);
-        EditText editTextTitle = findViewById(R.id.editTextTitle);
-        editTextTitle.setText(currentCourse.getTitle());
+        Intent intent = getIntent();
+        currentCourseUri = intent.getData();
 
+        Button deleteButton = findViewById(R.id.buttonDelete);
+        TextView textViewAddCourse = findViewById(R.id.textViewAddCourse);
+        editTextTitle = findViewById(R.id.editTextTitle);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
 
-        Date startDate = currentCourse.getStartDate();
-        if (startDate != null) {
-            editTextStartDate.setText(sdf.format(startDate));
-        }
-
-        Date endDate = currentCourse.getEndDate();
-        if (endDate != null) {
-            editTextEndDate.setText(sdf.format(endDate));
+        if (currentCourseUri == null) {
+            // No Uri so we must be adding a pet
+            textViewAddCourse.setText(getString(R.string.add_new_course));
+            deleteButton.setVisibility(View.GONE);
+        } else {
+            textViewAddCourse.setText(getString(R.string.edit_course));
+            int EDIT_COURSE = 1000;
+            getSupportLoaderManager().initLoader(EDIT_COURSE, null, this);
         }
 
         // set up array adapter
-        ListView listView = findViewById(R.id.listViewCourses);
-        adapter = new CourseChooserAdapter(this, ScheduleProvider.courses);
+        ListView listView = findViewById(R.id.listViewAssessments);
+        adapter = new AssessmentChooserAdapter(this, ScheduleProvider.assessments);
         listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();
@@ -117,20 +127,47 @@ public class EditCourse extends AppCompatActivity {
     }
 
     public void buttonSaveClicked(View view) {
-        Intent intent = new Intent();
 
-        EditText editTextTitle = findViewById(R.id.editTextTitle);
-        editTextStartDate = findViewById(R.id.editTextStartDate);
-        String courseTitle = editTextTitle.getText().toString();
-        if (courseTitle.isEmpty()) {
-            Toast.makeText(this, "No title entered! Unable to update course", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_CANCELED);
+        // get input from fields
+        String title = editTextTitle.getText().toString().trim();
+        String start = editTextStartDate.getText().toString().trim();
+        String end = editTextEndDate.getText().toString().trim();
+
+        if (currentCourseUri == null
+                && TextUtils.isEmpty(title)
+                && TextUtils.isEmpty(start)
+                && TextUtils.isEmpty(end)) {
+            // nothing entered, nothing to do
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(CourseEntry.TITLE, title);
+        values.put(CourseEntry.START_DATE, start);
+        values.put(CourseEntry.END_DATE, end);
+
+        // if this is a new course the Uri will be null
+        if (currentCourseUri == null) {
+            Uri newUri = getContentResolver().insert(CourseEntry.CONTENT_URI, values);
+
+            if (newUri == null) {
+                Toast.makeText(this, getString(R.string.insert_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.insert_successful), Toast.LENGTH_SHORT).show();
+            }
         } else {
-            intent.putExtra("selectedCourses", adapter.getSelectedCourses());
-            setResult(RESULT_OK, intent);
+            // existing course
+            int rowsChanged = getContentResolver().update(currentCourseUri, values, null, null);
+
+            if (rowsChanged == 0) {
+                Toast.makeText(this, getString(R.string.update_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.update_successful), Toast.LENGTH_SHORT).show();
+            }
         }
         finish();
     }
+
 
     public void buttonCancelClicked(View view) {
         finish();
@@ -145,15 +182,26 @@ public class EditCourse extends AppCompatActivity {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        removeCourse();
+                        deleteCourse();
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
-    private void removeCourse() {
-        intent.putExtra("deleteCourse", true);
-        setResult(RESULT_OK, intent);
+    private void deleteCourse() {
+
+        // only delete if this is an existing course
+        if (currentCourseUri != null) {
+            int numCoursesRemoved = getContentResolver().delete(currentCourseUri, null, null);
+
+            if (numCoursesRemoved == 0) {
+                Toast.makeText(this, getString(R.string.delete_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.delete_successful), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
         finish();
     }
 
@@ -163,5 +211,54 @@ public class EditCourse extends AppCompatActivity {
 
     private void updateEndDate() {
         editTextEndDate.setText(sdf.format(calendar.getTime()));
+    }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
+        String[] projection = new String[]{
+                CourseEntry._ID,
+                CourseEntry.TITLE,
+                CourseEntry.START_DATE,
+                CourseEntry.END_DATE
+        };
+
+        return new CursorLoader(
+                this,
+                CourseEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+
+        // if the cursor is empty, nothing to do
+        if (cursor == null || cursor.getCount() < 1) {
+            return;
+        }
+
+        if (cursor.moveToFirst()) {
+            int titleIndex = cursor.getColumnIndex(CourseEntry.TITLE);
+            int startIndex = cursor.getColumnIndex(CourseEntry.START_DATE);
+            int endIndex = cursor.getColumnIndex(CourseEntry.END_DATE);
+
+            String title = cursor.getString(titleIndex);
+            String start = cursor.getString(startIndex);
+            String end = cursor.getString(endIndex);
+
+            editTextTitle.setText(title);
+            editTextStartDate.setText(start);
+            editTextEndDate.setText(end);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        editTextTitle.setText("");
+        editTextStartDate.setText("");
+        editTextEndDate.setText("");
     }
 }
