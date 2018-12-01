@@ -238,13 +238,16 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                     ScheduleContract.CourseEntry._ID,
                     ScheduleContract.CourseEntry.TITLE,
                     ScheduleContract.CourseEntry.START_DATE,
-                    ScheduleContract.CourseEntry.END_DATE
+                    ScheduleContract.CourseEntry.END_DATE,
             };
+
+            // only return courses not already associated with a term
+            String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL";
 
             return new CursorLoader(this,
                     ScheduleContract.CourseEntry.CONTENT_URI,
                     projection,
-                    null,
+                    selection,
                     null,
                     null);
         }
