@@ -17,7 +17,7 @@ import static com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
  */
 public class AssessmentCursorAdapter extends CursorAdapter {
     public AssessmentCursorAdapter(Context context, Cursor cursor) {
-        super(context, cursor, 0 /*flags*/);
+        super(context, cursor, 0);
     }
 
     @Override

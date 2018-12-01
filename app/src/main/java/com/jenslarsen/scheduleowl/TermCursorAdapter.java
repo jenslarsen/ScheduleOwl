@@ -17,7 +17,7 @@ import static com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
  */
 public class TermCursorAdapter extends CursorAdapter {
     public TermCursorAdapter(Context context, Cursor cursor) {
-        super(context, cursor, 0 /*flags*/);
+        super(context, cursor, 0);
     }
 
     @Override

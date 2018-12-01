@@ -17,7 +17,7 @@ import static com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
  */
 public class MentorCursorAdapter extends CursorAdapter {
     public MentorCursorAdapter(Context context, Cursor cursor) {
-        super(context, cursor, 0 /*flags*/);
+        super(context, cursor, 0);
     }
 
     @Override
