@@ -27,9 +27,6 @@ import java.util.Date;
  * {@link ContentProvider} for the ScheduleOwl app.
  */
 public class ScheduleProvider extends ContentProvider {
-    public static ArrayList<Term> terms = new ArrayList<>();
-    public static ArrayList<Mentor> mentors = new ArrayList<>();
-    public static ArrayList<Course> courses = new ArrayList<>();
     public static ArrayList<Assessment> assessments = new ArrayList<>();
 
     /**
