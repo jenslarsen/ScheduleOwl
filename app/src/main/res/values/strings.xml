@@ -44,4 +44,5 @@
     <string name="update_failed">Update failed!</string>
     <string name="update_successful">Update successful!</string>
     <string name="edit_assessment">Edit Assessment</string>
+    <string name="send_to">Send To</string>
 </resources>
