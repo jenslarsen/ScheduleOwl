@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract;
@@ -24,11 +23,8 @@ import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 
 public class FragmentCourses extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static int ADD_COURSE = 1;
-    private final static int EDIT_COURSE = 2;
-    public static final int COURSE_LOADER = 1000;
+    public static final int COURSE_LOADER = 2000;
 
-    private int selectedPosition;
     private CourseCursorAdapter adapter;
 
     @Override

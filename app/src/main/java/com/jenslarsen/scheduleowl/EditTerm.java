@@ -15,6 +15,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -23,16 +24,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
-import com.jenslarsen.scheduleowl.db.ScheduleProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
 
-    CourseChooserAdapter adapter;
+    CourseCursorAdapter adapter;
     private Calendar calendar;
     private DatePickerDialog.OnDateSetListener startDatePicker;
     private DatePickerDialog.OnDateSetListener endDatePicker;
@@ -40,8 +41,12 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     private EditText editTextTitle;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
+    private ListView listViewCourses;
 
     private String dateFormat = "yyyy-MM-dd";
+
+    private int TERM_LOADER = 1000;
+    private int COURSE_LOADER = 2000;
 
     private SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
 
@@ -56,11 +61,15 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         Intent intent = getIntent();
         currentTermUri = intent.getData();
 
+        getSupportLoaderManager().initLoader(TERM_LOADER, null, this);
+        getSupportLoaderManager().initLoader(COURSE_LOADER, null, this);
+
         Button deleteButton = findViewById(R.id.buttonDelete);
         TextView textViewAddTerm = findViewById(R.id.textViewAddTerm);
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
+        listViewCourses = findViewById(R.id.listViewCourses);
 
         if (currentTermUri == null) {
             // No Uri so we must be adding a pet
@@ -68,14 +77,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             deleteButton.setVisibility(View.GONE);
         } else {
             textViewAddTerm.setText(getString(R.string.edit_term));
-            int EDIT_TERM = 1000;
-            getSupportLoaderManager().initLoader(EDIT_TERM, null, this);
         }
-
-        // set up array adapter
-        ListView listView = findViewById(R.id.listViewCourses);
-        adapter = new CourseChooserAdapter(this, ScheduleProvider.courses);
-        listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();
 
@@ -213,52 +215,84 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         editTextEndDate.setText(sdf.format(calendar.getTime()));
     }
 
-    @NonNull
     @Override
-    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-        String[] projection = new String[]{
-                TermEntry._ID,
-                TermEntry.TITLE,
-                TermEntry.START_DATE,
-                TermEntry.END_DATE
-        };
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle bundle) {
 
-        return new CursorLoader(
-                this,
-                TermEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
+        if (id == TERM_LOADER) {
+            String[] projection = new String[]{
+                    TermEntry._ID,
+                    TermEntry.TITLE,
+                    TermEntry.START_DATE,
+                    TermEntry.END_DATE
+            };
+
+            return new CursorLoader(
+                    this,
+                    TermEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null);
+        } else if (id == COURSE_LOADER) {
+            String[] projection = new String[]{
+                    ScheduleContract.CourseEntry._ID,
+                    ScheduleContract.CourseEntry.TITLE,
+                    ScheduleContract.CourseEntry.START_DATE,
+                    ScheduleContract.CourseEntry.END_DATE
+            };
+
+            return new CursorLoader(this,
+                    ScheduleContract.CourseEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null);
+        }
+        Log.e("EditTerm", "Invalid ID: " + id + " in onCreateLoader()!");
+        return null;
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader loader, Object data) {
+
+        int id = loader.getId();
+        Cursor cursor = (Cursor) data;
 
         // if the cursor is empty, nothing to do
         if (cursor == null || cursor.getCount() < 1) {
             return;
         }
 
-        if (cursor.moveToFirst()) {
-            int titleIndex = cursor.getColumnIndex(TermEntry.TITLE);
-            int startIndex = cursor.getColumnIndex(TermEntry.START_DATE);
-            int endIndex = cursor.getColumnIndex(TermEntry.END_DATE);
+        if (id == TERM_LOADER) {
 
-            String title = cursor.getString(titleIndex);
-            String start = cursor.getString(startIndex);
-            String end = cursor.getString(endIndex);
+            if (cursor.moveToFirst()) {
+                int titleIndex = cursor.getColumnIndex(TermEntry.TITLE);
+                int startIndex = cursor.getColumnIndex(TermEntry.START_DATE);
+                int endIndex = cursor.getColumnIndex(TermEntry.END_DATE);
 
-            editTextTitle.setText(title);
-            editTextStartDate.setText(start);
-            editTextEndDate.setText(end);
+                String title = cursor.getString(titleIndex);
+                String start = cursor.getString(startIndex);
+                String end = cursor.getString(endIndex);
+
+                editTextTitle.setText(title);
+                editTextStartDate.setText(start);
+                editTextEndDate.setText(end);
+            }
+        } else if (id == COURSE_LOADER) {
+            CourseSelectorCursorAdapter courseAdapter = new CourseSelectorCursorAdapter(this, cursor);
+            listViewCourses.setAdapter(courseAdapter);
         }
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        editTextTitle.setText("");
-        editTextStartDate.setText("");
-        editTextEndDate.setText("");
+    public void onLoaderReset(@NonNull Loader loader) {
+        int id = loader.getId();
+
+        if (id == TERM_LOADER) {
+            editTextTitle.setText("");
+            editTextStartDate.setText("");
+            editTextEndDate.setText("");
+        } else if (id == COURSE_LOADER) {
+        }
     }
 }
