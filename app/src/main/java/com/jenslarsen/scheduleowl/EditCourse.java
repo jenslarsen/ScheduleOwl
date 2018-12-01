@@ -265,6 +265,12 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     }
 
     public void buttonShareNotesClicked(View view) {
+
+        if (editTextNotes.getText().toString().trim().isEmpty()) {
+            // nothing entered - nothing to share
+            Toast.makeText(this, "Please enter notes before sharing", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent notesIntent = new Intent();
         notesIntent.setAction(Intent.ACTION_SEND);
         notesIntent.putExtra(Intent.EXTRA_TEXT,
@@ -272,6 +278,5 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                         + editTextNotes.getText().toString().trim());
         notesIntent.setType("text/plain");
         startActivity(Intent.createChooser(notesIntent, getResources().getText(R.string.send_to)));
-
     }
 }
