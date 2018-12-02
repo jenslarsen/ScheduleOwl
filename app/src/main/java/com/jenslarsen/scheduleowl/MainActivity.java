@@ -8,6 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Added to keep screen from redrawing with the orientation changes
+     * @param newConfig used to get the orientation, and then do nothing :)
+     */
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -19,6 +23,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Set up the tabLayout and ViewPager
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -22,6 +22,9 @@ import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
 
+/**
+ * Controls the Add/Edit term activity
+ */
 public class EditMentor extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Uri currentMentorUri;

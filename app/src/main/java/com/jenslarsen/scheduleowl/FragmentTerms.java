@@ -20,6 +20,9 @@ import android.widget.ListView;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 
+/**
+ * Loads the list of terms, an onClickListener and sets up a FAB action to add a new term.
+ */
 public class FragmentTerms extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int TERM_LOADER = 1000;

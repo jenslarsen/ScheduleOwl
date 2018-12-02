@@ -21,6 +21,9 @@ import android.widget.ListView;
 import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 
+/**
+ * Loads the list of courses, an onClickListener and sets up a FAB action to add a new course.
+ */
 public class FragmentCourses extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final int COURSE_LOADER = 2000;

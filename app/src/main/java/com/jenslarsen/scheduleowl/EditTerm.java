@@ -33,6 +33,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+/**
+ * Controls the Add/Edit term activity
+ */
 public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
 
     CourseCursorAdapter adapter;
@@ -56,6 +59,11 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     public EditTerm() {
     }
 
+    /**
+     * Sets up the Add/Edit Term activity. Uses currentTermId from the intent to determine if this
+     * is a new or existing term.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,8 +140,12 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         });
     }
 
+    /**
+     * Saves entered term data into the database. Also updates selected courses with the associated
+     * termId
+     * @param view
+     */
     public void buttonSaveClicked(View view) {
-
         // get input from fields
         String title = editTextTitle.getText().toString().trim();
         String start = editTextStartDate.getText().toString().trim();
@@ -213,13 +225,19 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         finish();
     }
 
-
+    /**
+     * User cancelled. Nothing to do so finish()
+     * @param view
+     */
     public void buttonCancelClicked(View view) {
         finish();
     }
 
+    /**
+     * Prompt the user if they really want to delete this term, then calls deleteTerm if they do.
+     * @param view
+     */
     public void buttonDeleteClicked(View view) {
-
         new AlertDialog.Builder(this)
                 .setTitle("Delete Term")
                 .setMessage("Are you sure?")
@@ -233,6 +251,9 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
+    /**
+     * Removes a term from the database and sends a toast to give the status
+     */
     private void deleteTerm() {
 
         // only delete if this is an existing term
@@ -244,20 +265,31 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             } else {
                 Toast.makeText(this, getString(R.string.delete_successful), Toast.LENGTH_SHORT).show();
             }
-
         }
-
         finish();
     }
 
+    /**
+     * Popluate start date field
+     */
     private void updateStartDate() {
         editTextStartDate.setText(sdf.format(calendar.getTime()));
     }
 
+    /**
+     * Populate end date field
+     */
     private void updateEndDate() {
         editTextEndDate.setText(sdf.format(calendar.getTime()));
     }
 
+    /**
+     * Load data. Uses id to determine if this is term or course data, and uses the currentTermId to
+     * determine if this a new or existing term.
+     * @param id
+     * @param bundle
+     * @return
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle bundle) {
         Uri uri;
@@ -270,6 +302,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             };
 
             if (currentTermUri == null) {
+                // TODO: Probably a better way to do this. Returning all terms if this is a new term - seems like a waste of time.
                 uri = TermEntry.CONTENT_URI;
             } else {
                 uri = currentTermUri;
@@ -301,6 +334,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                         null,
                         null);
             } else {  // get terms that are associated with the current term and unassociated terms
+                // TODO: This does seem to be working right?? Not loaded associated courses when editing a term
                 String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL or "
                         + ScheduleContract.CourseEntry.TERMID + "=?";
 
@@ -318,6 +352,12 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         return null;
     }
 
+    /**
+     * Populate the editTexts and course listview once data has been retrieved
+     *
+     * @param loader
+     * @param data   returned data. Cast back to a cursor.
+     */
     @Override
     public void onLoadFinished(@NonNull Loader loader, Object data) {
 
@@ -349,12 +389,18 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                 editTextEndDate.setText(end);
             }
         } else if (id == COURSE_LOADER) {
+            // get a list of courses associated with the current term
             CourseSelectorCursorAdapter courseAdapter =
                     new CourseSelectorCursorAdapter(this, cursor, currentTermId);
             listViewCourses.setAdapter(courseAdapter);
         }
     }
 
+    /**
+     * Clear the editTexts if the loader is reset
+     *
+     * @param loader used to get the id to determine if this is a term or course loader
+     */
     @Override
     public void onLoaderReset(@NonNull Loader loader) {
         int id = loader.getId();
@@ -364,7 +410,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             editTextStartDate.setText("");
             editTextEndDate.setText("");
         } else if (id == COURSE_LOADER) {
-            // don't do anything I guess?
+            // don't do anything I guess? Not sure if I need to do something here yet.
         }
     }
 }

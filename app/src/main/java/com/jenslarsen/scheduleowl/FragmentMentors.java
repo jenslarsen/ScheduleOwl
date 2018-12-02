@@ -22,12 +22,12 @@ import android.widget.ListView;
 import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
 
+/**
+ * Loads the list of mentors, an onClickListener and sets up a FAB action to add a new mentor.
+ */
 public class FragmentMentors extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static int EDIT_MENTOR = 2;
-    public static final int MENTOR_LOADER = 1000;
-
-    private int selectedPosition;
+    public static final int MENTOR_LOADER = 3000;
     private MentorCursorAdapter adapter;
 
     @Override
@@ -71,12 +71,6 @@ public class FragmentMentors extends Fragment implements LoaderManager.LoaderCal
     public void buttonAddMentorClicked() {
         Intent intent = new Intent(getActivity(), EditMentor.class);
         startActivity(intent);
-    }
-
-    public void mentorItemClicked(int selectedPosition) {
-        Intent intent = new Intent(getActivity(), EditMentor.class);
-        intent.putExtra("selectedPosition", selectedPosition);
-        startActivityForResult(intent, EDIT_MENTOR);
     }
 
     @NonNull

@@ -21,13 +21,13 @@ import android.widget.ListView;
 import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
 
+/**
+ * Loads the list of assessments, an onClickListener and sets up a FAB action to add a new assessment.
+ */
 public class FragmentAssessments extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static int ADD_ASSESSMENT = 1;
-    private final static int EDIT_ASSESSMENT = 2;
-    public static final int ASSESSMENT_LOADER = 1000;
+    public static final int ASSESSMENT_LOADER = 4000;
 
-    private int selectedPosition;
     private AssessmentCursorAdapter adapter;
 
     @Override
@@ -71,13 +71,7 @@ public class FragmentAssessments extends Fragment implements LoaderManager.Loade
     public void buttonAddAssessmentClicked() {
         Intent intent = new Intent(getActivity(), EditAssessment.class);
         startActivity(intent);
-        startActivityForResult(intent, ADD_ASSESSMENT);
-    }
-
-    public void assessmentItemClicked(int selectedPosition) {
-        Intent intent = new Intent(getActivity(), EditAssessment.class);
-        intent.putExtra("selectedPosition", selectedPosition);
-        startActivityForResult(intent, EDIT_ASSESSMENT);
+        startActivityForResult(intent, ASSESSMENT_LOADER);
     }
 
     @NonNull
