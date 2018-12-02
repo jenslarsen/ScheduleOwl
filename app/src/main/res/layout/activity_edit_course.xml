@@ -109,7 +109,8 @@
             android:id="@+id/spinnerCourseStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="10" />
+            android:layout_weight="5"
+            android:entries="@array/course_status" />
     </LinearLayout>
 
     <LinearLayout
@@ -170,7 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="10"
             android:onClick="buttonDeleteClicked"
-            android:text="Delete" />
+            android:text="@string/delete" />
 
         <Button
             android:id="@+id/buttonSave"
