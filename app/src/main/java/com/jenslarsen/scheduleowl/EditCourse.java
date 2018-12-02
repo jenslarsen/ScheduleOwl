@@ -15,34 +15,42 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
-import com.jenslarsen.scheduleowl.db.ScheduleProvider;
+import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class EditCourse extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EditCourse extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
 
     AssessmentChooserAdapter adapter;
     private Calendar calendar;
     private DatePickerDialog.OnDateSetListener startDatePicker;
     private DatePickerDialog.OnDateSetListener endDatePicker;
-    private Uri currentCourseUri;
+    private Uri currentCourseUri = null;
+    private int currentCourseId = -1;
     private EditText editTextTitle;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
     private EditText editTextNotes;
+    private ListView listViewAssessments;
 
     private String dateFormat = "yyyy-MM-dd";
+
+    private int COURSE_LOADER = 2000;
+    private int ASSESSMENT_LOADER = 4000;
 
     private SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
 
@@ -57,27 +65,25 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         Intent intent = getIntent();
         currentCourseUri = intent.getData();
 
+        getSupportLoaderManager().initLoader(COURSE_LOADER, null, this);
+        getSupportLoaderManager().initLoader(ASSESSMENT_LOADER, null, this);
+
         Button deleteButton = findViewById(R.id.buttonDelete);
         TextView textViewAddCourse = findViewById(R.id.textViewAddCourse);
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextNotes = findViewById(R.id.editTextNotes);
+        listViewAssessments = findViewById(R.id.listViewAssessments);
 
         if (currentCourseUri == null) {
-            // No Uri so we must be adding a pet
+            // No Uri so we must be adding a course
             textViewAddCourse.setText(getString(R.string.add_new_course));
             deleteButton.setVisibility(View.GONE);
         } else {
             textViewAddCourse.setText(getString(R.string.edit_course));
-            int EDIT_COURSE = 1000;
-            getSupportLoaderManager().initLoader(EDIT_COURSE, null, this);
+            currentCourseId = ScheduleDbHelper.getIdFromUri(currentCourseUri);
         }
-
-        // set up array adapter
-        ListView listView = findViewById(R.id.listViewAssessments);
-        adapter = new AssessmentChooserAdapter(this, ScheduleProvider.assessments);
-        listView.setAdapter(adapter);
 
         calendar = Calendar.getInstance();
 
@@ -140,6 +146,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                 && TextUtils.isEmpty(start)
                 && TextUtils.isEmpty(end)) {
             // nothing entered, nothing to do
+            Toast.makeText(this, "Unable to save. Nothing entered!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -151,10 +158,29 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         // if this is a new course the Uri will be null
         if (currentCourseUri == null) {
             Uri newUri = getContentResolver().insert(CourseEntry.CONTENT_URI, values);
-
             if (newUri == null) {
                 Toast.makeText(this, getString(R.string.insert_failed), Toast.LENGTH_SHORT).show();
             } else {
+                // loop through the assessments and update the courseId if necessary
+                currentCourseId = ScheduleDbHelper.getIdFromUri(newUri);
+                CheckBox checkBox;
+                TextView textViewId;
+
+                for (int index = 0; index < listViewAssessments.getCount(); index++) {
+                    checkBox = listViewAssessments.getChildAt(index).findViewById(R.id.checkBoxChooser);
+                    textViewId = listViewAssessments.getChildAt(index).findViewById(R.id.textViewId);
+                    if (checkBox.isChecked()) {
+                        String assessmentId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(ScheduleContract.AssessmentEntry.CONTENT_URI, assessmentId);
+                        ContentValues addCourseId = new ContentValues();
+                        addCourseId.put(ScheduleContract.AssessmentEntry.COURSEID, currentCourseId);
+                        int assessmentRowsUpdated = getContentResolver()
+                                .update(uri, addCourseId, null, null);
+                        if (assessmentRowsUpdated < 1) {
+                            Toast.makeText(this, "Error updating assessment " + assessmentId + " with courseId!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
                 Toast.makeText(this, getString(R.string.insert_successful), Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -164,19 +190,35 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             if (rowsChanged == 0) {
                 Toast.makeText(this, getString(R.string.update_failed), Toast.LENGTH_SHORT).show();
             } else {
+                CheckBox checkBox;
+                TextView textViewId;
+
+                for (int index = 0; index < listViewAssessments.getCount(); index++) {
+                    checkBox = listViewAssessments.getChildAt(index).findViewById(R.id.checkBoxChooser);
+                    textViewId = listViewAssessments.getChildAt(index).findViewById(R.id.textViewId);
+                    if (checkBox.isChecked()) {
+                        String assessmentId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(ScheduleContract.AssessmentEntry.CONTENT_URI, assessmentId);
+                        ContentValues addCourseId = new ContentValues();
+                        addCourseId.put(ScheduleContract.AssessmentEntry.COURSEID, currentCourseId);
+                        int assessmentRowsUpdated = getContentResolver()
+                                .update(uri, addCourseId, null, null);
+                        if (assessmentRowsUpdated < 1) {
+                            Toast.makeText(this, "Error updating assessment " + assessmentId + " with courseId!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
                 Toast.makeText(this, getString(R.string.update_successful), Toast.LENGTH_SHORT).show();
             }
         }
         finish();
     }
 
-
     public void buttonCancelClicked(View view) {
         finish();
     }
 
     public void buttonDeleteClicked(View view) {
-
         new AlertDialog.Builder(this)
                 .setTitle("Delete Course")
                 .setMessage("Are you sure?")
@@ -215,53 +257,115 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         editTextEndDate.setText(sdf.format(calendar.getTime()));
     }
 
-    @NonNull
     @Override
-    public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
-        String[] projection = new String[]{
-                CourseEntry._ID,
-                CourseEntry.TITLE,
-                CourseEntry.START_DATE,
-                CourseEntry.END_DATE
-        };
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle bundle) {
+        Uri uri;
+        if (id == COURSE_LOADER) {
+            String[] projection = new String[]{
+                    CourseEntry._ID,
+                    CourseEntry.TITLE,
+                    CourseEntry.START_DATE,
+                    CourseEntry.END_DATE
+            };
 
-        return new CursorLoader(
-                this,
-                CourseEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
+            if (currentCourseUri == null) {
+                // TODO: Probably a better way to do this. Returning all courses if this is a new course - seems like a waste of time.
+                uri = CourseEntry.CONTENT_URI;
+            } else {
+                uri = currentCourseUri;
+            }
+
+            return new CursorLoader(
+                    this,
+                    uri,
+                    projection,
+                    null,
+                    null,
+                    null);
+        } else if (id == ASSESSMENT_LOADER) {
+            String[] projection = new String[]{
+                    ScheduleContract.AssessmentEntry._ID,
+                    ScheduleContract.AssessmentEntry.TITLE,
+                    ScheduleContract.AssessmentEntry.DUE_DATE,
+                    ScheduleContract.AssessmentEntry.COURSEID
+            };
+
+            if (currentCourseUri == null) { // only return assessments not associated
+                String selection = ScheduleContract.AssessmentEntry.COURSEID + " IS NULL";
+
+                return new CursorLoader(this,
+                        ScheduleContract.AssessmentEntry.CONTENT_URI,
+                        projection,
+                        selection,
+                        null,
+                        null);
+            } else {  // get assessments that are associated with the current course and unassociated courses
+                // TODO: This does seem to be working right?? Not loaded associated assessments when editing a course
+                String selection = ScheduleContract.AssessmentEntry.COURSEID + " IS NULL or "
+                        + ScheduleContract.AssessmentEntry.COURSEID + "=?";
+
+                String[] selectionArgs = {Integer.toString(currentCourseId)};
+
+                return new CursorLoader(this,
+                        ScheduleContract.AssessmentEntry.CONTENT_URI,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null);
+            }
+        }
+        Log.e("EditCourse", "Invalid ID: " + id + " in onCreateLoader()!");
+        return null;
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader loader, Object data) {
+
+        int id = loader.getId();
+        Cursor cursor = (Cursor) data;
 
         // if the cursor is empty, nothing to do
         if (cursor == null || cursor.getCount() < 1) {
             return;
         }
 
-        if (cursor.moveToFirst()) {
-            int titleIndex = cursor.getColumnIndex(CourseEntry.TITLE);
-            int startIndex = cursor.getColumnIndex(CourseEntry.START_DATE);
-            int endIndex = cursor.getColumnIndex(CourseEntry.END_DATE);
+        if (id == COURSE_LOADER) {
+            if (currentCourseUri == null) {
+                // new course - don't load any fields
+                return;
+            }
 
-            String title = cursor.getString(titleIndex);
-            String start = cursor.getString(startIndex);
-            String end = cursor.getString(endIndex);
+            if (cursor.moveToFirst()) {
+                int titleIndex = cursor.getColumnIndex(CourseEntry.TITLE);
+                int startIndex = cursor.getColumnIndex(CourseEntry.START_DATE);
+                int endIndex = cursor.getColumnIndex(CourseEntry.END_DATE);
 
-            editTextTitle.setText(title);
-            editTextStartDate.setText(start);
-            editTextEndDate.setText(end);
+                String title = cursor.getString(titleIndex);
+                String start = cursor.getString(startIndex);
+                String end = cursor.getString(endIndex);
+
+                editTextTitle.setText(title);
+                editTextStartDate.setText(start);
+                editTextEndDate.setText(end);
+            }
+        } else if (id == ASSESSMENT_LOADER) {
+            // get a list of assessments associated with the current course
+            AssessmentSelectorCursorAdapter assessmentAdapter =
+                    new AssessmentSelectorCursorAdapter(this, cursor, currentCourseId);
+            listViewAssessments.setAdapter(assessmentAdapter);
         }
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        editTextTitle.setText("");
-        editTextStartDate.setText("");
-        editTextEndDate.setText("");
+    public void onLoaderReset(@NonNull Loader loader) {
+        int id = loader.getId();
+        if (id == COURSE_LOADER) {
+            editTextTitle.setText("");
+            editTextStartDate.setText("");
+            editTextEndDate.setText("");
+        } else if (id == ASSESSMENT_LOADER) {
+            // don't do anything I guess? Not sure if I need to do something here yet.
+        }
     }
 
     public void buttonShareNotesClicked(View view) {
