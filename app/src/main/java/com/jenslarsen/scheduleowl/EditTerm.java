@@ -37,14 +37,12 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     private Calendar calendar;
     private DatePickerDialog.OnDateSetListener startDatePicker;
     private DatePickerDialog.OnDateSetListener endDatePicker;
-    private Uri currentTermUri;
+    private Uri currentTermUri = null;
     private int currentTermId;
     private EditText editTextTitle;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
     private ListView listViewCourses;
-
-    boolean isNewTerm = false;
 
     private String dateFormat = "yyyy-MM-dd";
 
@@ -78,10 +76,8 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             // No Uri so we must be adding a term
             textViewAddTerm.setText(getString(R.string.add_new_term));
             deleteButton.setVisibility(View.GONE);
-            isNewTerm = true;
         } else {
             textViewAddTerm.setText(getString(R.string.edit_term));
-            isNewTerm = false;
             String path = currentTermUri.getPath();
             currentTermId = Integer.parseInt(path.substring(path.lastIndexOf("/") + 1));
         }
@@ -147,6 +143,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                 && TextUtils.isEmpty(start)
                 && TextUtils.isEmpty(end)) {
             // nothing entered, nothing to do
+            Toast.makeText(this, "Unable to save. Nothing entered!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -224,7 +221,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle bundle) {
-
+        Uri uri;
         if (id == TERM_LOADER) {
             String[] projection = new String[]{
                     TermEntry._ID,
@@ -233,9 +230,15 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                     TermEntry.END_DATE
             };
 
+            if (currentTermUri == null) {
+                uri = TermEntry.CONTENT_URI;
+            } else {
+                uri = currentTermUri;
+            }
+
             return new CursorLoader(
                     this,
-                    TermEntry.CONTENT_URI,
+                    uri,
                     projection,
                     null,
                     null,
@@ -249,7 +252,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                     ScheduleContract.CourseEntry.TERMID
             };
 
-            if (isNewTerm) { // only return courses not associated
+            if (currentTermUri == null) { // only return courses not associated
                 String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL";
 
                 return new CursorLoader(this,
@@ -288,6 +291,10 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         }
 
         if (id == TERM_LOADER) {
+            if (currentTermUri == null) {
+                // new term - don't load any fields
+                return;
+            }
 
             if (cursor.moveToFirst()) {
                 int titleIndex = cursor.getColumnIndex(TermEntry.TITLE);
