@@ -18,6 +18,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,7 +40,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     private DatePickerDialog.OnDateSetListener startDatePicker;
     private DatePickerDialog.OnDateSetListener endDatePicker;
     private Uri currentTermUri = null;
-    private int currentTermId;
+    private int currentTermId = -1;
     private EditText editTextTitle;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
@@ -78,8 +80,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             deleteButton.setVisibility(View.GONE);
         } else {
             textViewAddTerm.setText(getString(R.string.edit_term));
-            String path = currentTermUri.getPath();
-            currentTermId = Integer.parseInt(path.substring(path.lastIndexOf("/") + 1));
+            currentTermId = ScheduleDbHelper.getIdFromUri(currentTermUri);
         }
 
         calendar = Calendar.getInstance();
@@ -155,10 +156,29 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         // if this is a new term the Uri will be null
         if (currentTermUri == null) {
             Uri newUri = getContentResolver().insert(TermEntry.CONTENT_URI, values);
-
             if (newUri == null) {
                 Toast.makeText(this, getString(R.string.insert_failed), Toast.LENGTH_SHORT).show();
             } else {
+                // loop through the courses and update the termId if necessary
+                currentTermId = ScheduleDbHelper.getIdFromUri(newUri);
+                CheckBox checkBox;
+                TextView textViewId;
+
+                for (int index = 0; index < listViewCourses.getCount(); index++) {
+                    checkBox = listViewCourses.getChildAt(index).findViewById(R.id.checkBoxChooser);
+                    textViewId = listViewCourses.getChildAt(index).findViewById(R.id.textViewId);
+                    if (checkBox.isChecked()) {
+                        String courseId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(ScheduleContract.CourseEntry.CONTENT_URI, courseId);
+                        ContentValues addTermId = new ContentValues();
+                        addTermId.put(ScheduleContract.CourseEntry.TERMID, currentTermId);
+                        int courseRowsUpdated = getContentResolver()
+                                .update(uri, addTermId, null, null);
+                        if (courseRowsUpdated < 1) {
+                            Toast.makeText(this, "Error updating course " + courseId + " with termId!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
                 Toast.makeText(this, getString(R.string.insert_successful), Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -168,6 +188,25 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             if (rowsChanged == 0) {
                 Toast.makeText(this, getString(R.string.update_failed), Toast.LENGTH_SHORT).show();
             } else {
+                // loop through the courses and update the termId if necessary
+                CheckBox checkBox;
+                TextView textViewId;
+
+                for (int index = 0; index < listViewCourses.getCount(); index++) {
+                    checkBox = listViewCourses.getChildAt(index).findViewById(R.id.checkBoxChooser);
+                    textViewId = listViewCourses.getChildAt(index).findViewById(R.id.textViewId);
+                    if (checkBox.isChecked()) {
+                        String courseId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(ScheduleContract.CourseEntry.CONTENT_URI, courseId);
+                        ContentValues addTermId = new ContentValues();
+                        addTermId.put(ScheduleContract.CourseEntry.TERMID, currentTermId);
+                        int courseRowsUpdated = getContentResolver()
+                                .update(uri, addTermId, null, null);
+                        if (courseRowsUpdated < 1) {
+                            Toast.makeText(this, "Error updating course " + courseId + " with termId!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
                 Toast.makeText(this, getString(R.string.update_successful), Toast.LENGTH_SHORT).show();
             }
         }

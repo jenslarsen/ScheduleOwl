@@ -38,6 +38,7 @@ public class CourseSelectorCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         TextView textViewTitle = view.findViewById(R.id.textViewChooser);
         CheckBox checkBox = view.findViewById(R.id.checkBoxChooser);
+        TextView textViewId = view.findViewById(R.id.textViewId);
 
         int titleColumn = cursor.getColumnIndex(CourseEntry.TITLE);
         String title = cursor.getString(titleColumn);
@@ -49,5 +50,9 @@ public class CourseSelectorCursorAdapter extends CursorAdapter {
         if (termId == currentTermId) {
             checkBox.setChecked(true);
         }
+
+        int courseIdIndex = cursor.getColumnIndex(CourseEntry._ID);
+        int courseId = cursor.getInt(courseIdIndex);
+        textViewId.setText(Integer.toString(courseId));
     }
 }
