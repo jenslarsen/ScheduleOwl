@@ -38,10 +38,13 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     private DatePickerDialog.OnDateSetListener startDatePicker;
     private DatePickerDialog.OnDateSetListener endDatePicker;
     private Uri currentTermUri;
+    private int currentTermId;
     private EditText editTextTitle;
     private EditText editTextStartDate;
     private EditText editTextEndDate;
     private ListView listViewCourses;
+
+    boolean isNewTerm = false;
 
     private String dateFormat = "yyyy-MM-dd";
 
@@ -72,11 +75,15 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         listViewCourses = findViewById(R.id.listViewCourses);
 
         if (currentTermUri == null) {
-            // No Uri so we must be adding a pet
+            // No Uri so we must be adding a term
             textViewAddTerm.setText(getString(R.string.add_new_term));
             deleteButton.setVisibility(View.GONE);
+            isNewTerm = true;
         } else {
             textViewAddTerm.setText(getString(R.string.edit_term));
+            isNewTerm = false;
+            String path = currentTermUri.getPath();
+            currentTermId = Integer.parseInt(path.substring(path.lastIndexOf("/") + 1));
         }
 
         calendar = Calendar.getInstance();
@@ -239,17 +246,31 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                     ScheduleContract.CourseEntry.TITLE,
                     ScheduleContract.CourseEntry.START_DATE,
                     ScheduleContract.CourseEntry.END_DATE,
+                    ScheduleContract.CourseEntry.TERMID
             };
 
-            // only return courses not already associated with a term
-            String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL";
+            if (isNewTerm) { // only return courses not associated
+                String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL";
 
-            return new CursorLoader(this,
-                    ScheduleContract.CourseEntry.CONTENT_URI,
-                    projection,
-                    selection,
-                    null,
-                    null);
+                return new CursorLoader(this,
+                        ScheduleContract.CourseEntry.CONTENT_URI,
+                        projection,
+                        selection,
+                        null,
+                        null);
+            } else {  // get terms that are associated with the current term and unassociated terms
+                String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL or "
+                        + ScheduleContract.CourseEntry.TERMID + "=?";
+
+                String[] selectionArgs = {Integer.toString(currentTermId)};
+
+                return new CursorLoader(this,
+                        ScheduleContract.CourseEntry.CONTENT_URI,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null);
+            }
         }
         Log.e("EditTerm", "Invalid ID: " + id + " in onCreateLoader()!");
         return null;
@@ -282,7 +303,8 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                 editTextEndDate.setText(end);
             }
         } else if (id == COURSE_LOADER) {
-            CourseSelectorCursorAdapter courseAdapter = new CourseSelectorCursorAdapter(this, cursor);
+            CourseSelectorCursorAdapter courseAdapter =
+                    new CourseSelectorCursorAdapter(this, cursor, currentTermId);
             listViewCourses.setAdapter(courseAdapter);
         }
     }
@@ -296,6 +318,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             editTextStartDate.setText("");
             editTextEndDate.setText("");
         } else if (id == COURSE_LOADER) {
+            // don't do anything I guess?
         }
     }
 }
