@@ -45,8 +45,10 @@
     <string name="update_successful">Update successful!</string>
     <string name="edit_assessment">Edit Assessment</string>
     <string name="send_to">Send To</string>
-    <string name="status_in_progress">In Progress</string>
-    <string name="status_completed">Completed</string>
-    <string name="status_dropped">Dropped</string>
-    <string name="status_planned">Planned</string>
+    <string-array name="course_status">
+        <item>In Progress</item>
+        <item>Completed</item>
+        <item>Dropped</item>
+        <item>Planned</item>
+    </string-array>
 </resources>
