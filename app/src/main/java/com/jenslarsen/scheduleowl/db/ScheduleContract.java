@@ -4,6 +4,9 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+/**
+ * Contract class to store all the constants used to create and manage the database
+ */
 public final class ScheduleContract {
 
     private ScheduleContract() {

@@ -10,6 +10,10 @@ import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 
+/**
+ * Helper class to create, upgrade, and delete the database. Plus some other database related
+ * helper methods.
+ */
 public class ScheduleDbHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * {@link ContentProvider} for the ScheduleOwl app.
+ * {@link ContentProvider} for the ScheduleOwl app. Abstract away all that ugly SQL stuff.
  */
 public class ScheduleProvider extends ContentProvider {
     public static ArrayList<Assessment> assessments = new ArrayList<>();
