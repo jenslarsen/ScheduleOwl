@@ -3,6 +3,7 @@ package com.jenslarsen.scheduleowl.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
@@ -88,5 +89,10 @@ public class ScheduleDbHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public static int getIdFromUri(Uri uri) {
+        String path = uri.getPath();
+        return Integer.parseInt(path.substring(path.lastIndexOf("/") + 1));
     }
 }
