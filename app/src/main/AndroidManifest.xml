@@ -16,6 +16,7 @@
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -28,6 +29,11 @@
             android:name=".db.ScheduleProvider"
             android:authorities="com.jenslarsen.scheduleowl"
             android:exported="false" />
+
+        <receiver
+            android:name=".ScheduleReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

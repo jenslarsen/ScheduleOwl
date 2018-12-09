@@ -45,6 +45,9 @@
     <string name="update_successful">Update successful!</string>
     <string name="edit_assessment">Edit Assessment</string>
     <string name="send_to">Send To</string>
+    <string name="channel_name">ScheduleOwl</string>
+    <string name="channel_description">Description Goes Here</string>
+    <string name="select_mentors">Select Mentors</string>
     <string-array name="course_status">
         <item>In Progress</item>
         <item>Completed</item>

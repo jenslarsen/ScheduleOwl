@@ -258,6 +258,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
 
         // only delete if this is an existing term
         if (currentTermUri != null) {
+            // TODO: Implement validation so that a term cannot be deleted if courses are assigned to it.
             int numTermsRemoved = getContentResolver().delete(currentTermUri, null, null);
 
             if (numTermsRemoved == 0) {
@@ -338,7 +339,8 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                 String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL or "
                         + ScheduleContract.CourseEntry.TERMID + "=?";
 
-                String[] selectionArgs = {Integer.toString(currentTermId)};
+                Toast.makeText(this, "currentTermId: " + currentTermId, Toast.LENGTH_SHORT).show();
+                String[] selectionArgs = {String.valueOf(currentTermId)};
 
                 return new CursorLoader(this,
                         ScheduleContract.CourseEntry.CONTENT_URI,

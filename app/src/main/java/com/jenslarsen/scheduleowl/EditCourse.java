@@ -372,6 +372,8 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     @Override
     public void onLoadFinished(@NonNull Loader loader, Object data) {
 
+        //TODO: Add mentor loader also
+
         int id = loader.getId();
         Cursor cursor = (Cursor) data;
 
