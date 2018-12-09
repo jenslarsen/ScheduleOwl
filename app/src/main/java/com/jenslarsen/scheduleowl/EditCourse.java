@@ -1,7 +1,10 @@
 package com.jenslarsen.scheduleowl;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,11 +20,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,8 +34,10 @@ import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class EditCourse extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
@@ -46,6 +53,8 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     private EditText editTextEndDate;
     private EditText editTextNotes;
     private ListView listViewAssessments;
+    private int courseStatus;
+
 
     private String dateFormat = "yyyy-MM-dd";
 
@@ -70,11 +79,25 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
         Button deleteButton = findViewById(R.id.buttonDelete);
         TextView textViewAddCourse = findViewById(R.id.textViewAddCourse);
+        Spinner spinnerCourseStatus = findViewById(R.id.spinnerCourseStatus);
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextNotes = findViewById(R.id.editTextNotes);
         listViewAssessments = findViewById(R.id.listViewAssessments);
+
+        // set up spinner
+        spinnerCourseStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                courseStatus = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                return;
+            }
+        });
 
         if (currentCourseUri == null) {
             // No Uri so we must be adding a course
@@ -136,6 +159,9 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
     public void buttonSaveClicked(View view) {
 
+        CheckBox checkBoxStart = findViewById(R.id.checkBoxStart);
+        CheckBox checkBoxEnd = findViewById(R.id.checkBoxEnd);
+
         // get input from fields
         String title = editTextTitle.getText().toString().trim();
         String start = editTextStartDate.getText().toString().trim();
@@ -154,6 +180,31 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         values.put(CourseEntry.TITLE, title);
         values.put(CourseEntry.START_DATE, start);
         values.put(CourseEntry.END_DATE, end);
+
+        // set up alerts
+        if (checkBoxStart.isChecked()) {
+            // TODO: set up start alert
+            try {
+                Date date = sdf.parse(editTextStartDate.getText().toString());
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                createAlert(cal);
+            } catch (ParseException e) {
+                Toast.makeText(this, "Unable to start parse date!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (checkBoxEnd.isChecked()) {
+            // TODO: set up end alert
+            try {
+                Date date = sdf.parse(editTextEndDate.getText().toString());
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                createAlert(cal);
+            } catch (ParseException e) {
+                Toast.makeText(this, "Unable to end parse date!", Toast.LENGTH_SHORT).show();
+            }
+        }
 
         // if this is a new course the Uri will be null
         if (currentCourseUri == null) {
@@ -382,5 +433,14 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                         + editTextNotes.getText().toString().trim());
         notesIntent.setType("text/plain");
         startActivity(Intent.createChooser(notesIntent, getResources().getText(R.string.send_to)));
+    }
+
+    public void createAlert(Calendar alertDate) {
+        long alert = alertDate.getTimeInMillis();
+        Log.i("createAlert", alertDate.toString() + ": " + alert);
+        Intent intent = new Intent(EditCourse.this, ScheduleReceiver.class);
+        PendingIntent sender = PendingIntent.getBroadcast(EditCourse.this, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alert, sender);
     }
 }
