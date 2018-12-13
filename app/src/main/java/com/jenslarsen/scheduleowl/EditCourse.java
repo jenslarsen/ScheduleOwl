@@ -53,12 +53,14 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     private EditText editTextEndDate;
     private EditText editTextNotes;
     private ListView listViewAssessments;
+    private ListView listViewMentors;
     private int courseStatus;
 
 
     private String dateFormat = "yyyy-MM-dd";
 
     private int COURSE_LOADER = 2000;
+    private int MENTOR_LOADER = 3000;
     private int ASSESSMENT_LOADER = 4000;
 
     private SimpleDateFormat sdf = new SimpleDateFormat(dateFormat, Locale.US);
@@ -76,6 +78,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
         getSupportLoaderManager().initLoader(COURSE_LOADER, null, this);
         getSupportLoaderManager().initLoader(ASSESSMENT_LOADER, null, this);
+        getSupportLoaderManager().initLoader(MENTOR_LOADER, null, this);
 
         Button deleteButton = findViewById(R.id.buttonDelete);
         TextView textViewAddCourse = findViewById(R.id.textViewAddCourse);
@@ -85,6 +88,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextNotes = findViewById(R.id.editTextNotes);
         listViewAssessments = findViewById(R.id.listViewAssessments);
+        listViewMentors = findViewById(R.id.listViewMentors);
 
         // set up spinner
         spinnerCourseStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -364,6 +368,21 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                         selectionArgs,
                         null);
             }
+        } else if (id == MENTOR_LOADER) {
+            Toast.makeText(this, "Loading Mentors!", Toast.LENGTH_SHORT).show();
+            String[] projection = new String[]{
+                    ScheduleContract.MentorEntry._ID,
+                    ScheduleContract.MentorEntry.NAME,
+                    ScheduleContract.MentorEntry.EMAIL,
+                    ScheduleContract.MentorEntry.PHONE
+            };
+
+            return new CursorLoader(this,
+                    ScheduleContract.MentorEntry.CONTENT_URI,
+                    projection,
+                    null,
+                    null,
+                    null);
         }
         Log.e("EditCourse", "Invalid ID: " + id + " in onCreateLoader()!");
         return null;
@@ -406,6 +425,11 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             AssessmentSelectorCursorAdapter assessmentAdapter =
                     new AssessmentSelectorCursorAdapter(this, cursor, currentCourseId);
             listViewAssessments.setAdapter(assessmentAdapter);
+        } else if (id == MENTOR_LOADER) {
+            // get a list of mentors associated with the current course
+            MentorSelectorCursorAdapter mentorAdapter =
+                    new MentorSelectorCursorAdapter(this, cursor, currentCourseId);
+            listViewMentors.setAdapter(mentorAdapter);
         }
     }
 
