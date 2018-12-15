@@ -115,7 +115,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         calendar = Calendar.getInstance();
 
         // set up start date picker
-        // TODO: Fix date picker so it shows the date from the current course
         startDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -138,7 +137,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         });
 
         // set up end date picker
-        // TODO: Fix date picker so it shows the date from the current course
         endDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {

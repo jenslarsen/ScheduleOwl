@@ -15,6 +15,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -24,8 +25,10 @@ import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract.AssessmentEntry;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class EditAssessment extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -73,7 +76,6 @@ public class EditAssessment extends AppCompatActivity implements LoaderManager.L
         calendar = Calendar.getInstance();
 
         // set up due date picker
-        // TODO: Fix date picker so it shows the date from the current assessment
         dueDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
