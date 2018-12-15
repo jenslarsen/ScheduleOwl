@@ -54,7 +54,11 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     private EditText editTextNotes;
     private ListView listViewAssessments;
     private ListView listViewMentors;
-    private int courseStatus;
+    private CheckBox checkBoxEnd;
+    private CheckBox checkBoxStart;
+    private boolean startBoxChecked;
+    private boolean endBoxChecked;
+    private int courseStatus;  // TODO: Save course status to database
 
 
     private String dateFormat = "yyyy-MM-dd";
@@ -89,6 +93,9 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         editTextNotes = findViewById(R.id.editTextNotes);
         listViewAssessments = findViewById(R.id.listViewAssessments);
         listViewMentors = findViewById(R.id.listViewMentors);
+        checkBoxStart = findViewById(R.id.checkBoxStart);
+        checkBoxEnd = findViewById(R.id.checkBoxEnd);
+
 
         // set up spinner
         spinnerCourseStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -157,12 +164,26 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                         .show();
             }
         });
+
+        // set up checkbox onClickListeners
+        checkBoxStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startBoxChecked = checkBoxStart.isChecked();
+                Toast.makeText(EditCourse.this, "Start Click: " + startBoxChecked, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        checkBoxEnd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                endBoxChecked = checkBoxEnd.isChecked();
+                Toast.makeText(EditCourse.this, "End Click: " + endBoxChecked, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void buttonSaveClicked(View view) {
-
-        CheckBox checkBoxStart = findViewById(R.id.checkBoxStart);
-        CheckBox checkBoxEnd = findViewById(R.id.checkBoxEnd);
 
         // get input from fields
         String title = editTextTitle.getText().toString().trim();
@@ -184,7 +205,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         values.put(CourseEntry.END_DATE, end);
 
         // set up alerts
-        if (checkBoxStart.isChecked()) {
+        if (startBoxChecked) {
             // TODO: set up start alert
             try {
                 Date date = sdf.parse(editTextStartDate.getText().toString());
@@ -197,7 +218,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             }
         }
 
-        if (checkBoxEnd.isChecked()) {
+        if (endBoxChecked) {
             // TODO: set up end alert
             try {
                 Date date = sdf.parse(editTextEndDate.getText().toString());
@@ -368,7 +389,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                         null);
             }
         } else if (id == MENTOR_LOADER) {
-            Toast.makeText(this, "Loading Mentors!", Toast.LENGTH_SHORT).show();
             String[] projection = new String[]{
                     ScheduleContract.MentorEntry._ID,
                     ScheduleContract.MentorEntry.NAME,
