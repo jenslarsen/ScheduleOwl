@@ -94,7 +94,6 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         calendar = Calendar.getInstance();
 
         // set up start date picker
-        // TODO: Fix date picker so it shows the date from the current term
         startDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -117,7 +116,6 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
         });
 
         // set up end date picker
-        // TODO: Fix date picker so it shows the date from the current term
         endDatePicker = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
