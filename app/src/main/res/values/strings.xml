@@ -48,6 +48,8 @@
     <string name="channel_name">ScheduleOwl</string>
     <string name="channel_description">Description Goes Here</string>
     <string name="select_mentors">Select Mentors</string>
+    <string name="welcome_text">Welcome to ScheduleOwl. Use the tabs on the next screen to add and edit items to track your progress. Click Start to begin.</string>
+    <string name="start">Start</string>
     <string-array name="course_status">
         <item>In Progress</item>
         <item>Completed</item>

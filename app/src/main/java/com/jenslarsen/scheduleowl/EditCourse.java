@@ -190,11 +190,12 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             // TODO: set up start alert
             try {
                 Date date = sdf.parse(editTextStartDate.getText().toString());
+                Toast.makeText(this, "Setting alert for " + editTextStartDate.getText().toString(), Toast.LENGTH_SHORT).show();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(date);
                 createAlert(cal);
             } catch (ParseException e) {
-                Toast.makeText(this, "Unable to start parse date!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Unable to parse start date!", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -206,7 +207,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                 cal.setTime(date);
                 createAlert(cal);
             } catch (ParseException e) {
-                Toast.makeText(this, "Unable to end parse date!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Unable to parse end date!", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -391,8 +392,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     @Override
     public void onLoadFinished(@NonNull Loader loader, Object data) {
 
-        //TODO: Add mentor loader also
-
         int id = loader.getId();
         Cursor cursor = (Cursor) data;
 
@@ -463,7 +462,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
     public void createAlert(Calendar alertDate) {
         long alert = alertDate.getTimeInMillis();
-        Log.i("createAlert", alertDate.toString() + ": " + alert);
         Intent intent = new Intent(EditCourse.this, ScheduleReceiver.class);
         PendingIntent sender = PendingIntent.getBroadcast(EditCourse.this, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
