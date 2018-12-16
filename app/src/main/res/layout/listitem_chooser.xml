@@ -22,6 +22,7 @@
         android:layout_weight="10"
         android:checked="false"
         android:text="@string/chooser_item"
+        android:textColor="@android:color/background_light"
         android:textSize="18sp" />
 
     <CheckBox
