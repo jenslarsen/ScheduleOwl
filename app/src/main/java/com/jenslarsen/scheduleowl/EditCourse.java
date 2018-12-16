@@ -206,25 +206,23 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
         // set up alerts
         if (startBoxChecked) {
-            // TODO: set up start alert
             try {
                 Date date = sdf.parse(editTextStartDate.getText().toString());
                 Toast.makeText(this, "Setting alert for " + editTextStartDate.getText().toString(), Toast.LENGTH_SHORT).show();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(date);
-                createAlert(cal);
+                createAlert(cal, editTextTitle.getText().toString(), "Starting today");
             } catch (ParseException e) {
                 Toast.makeText(this, "Unable to parse start date!", Toast.LENGTH_SHORT).show();
             }
         }
 
         if (endBoxChecked) {
-            // TODO: set up end alert
             try {
                 Date date = sdf.parse(editTextEndDate.getText().toString());
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(date);
-                createAlert(cal);
+                createAlert(cal, editTextTitle.getText().toString(), "Ending today");
             } catch (ParseException e) {
                 Toast.makeText(this, "Unable to parse end date!", Toast.LENGTH_SHORT).show();
             }
@@ -344,7 +342,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             };
 
             if (currentCourseUri == null) {
-                // TODO: Probably a better way to do this. Returning all courses if this is a new course - seems like a waste of time.
                 uri = CourseEntry.CONTENT_URI;
             } else {
                 uri = currentCourseUri;
@@ -478,9 +475,11 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         startActivity(Intent.createChooser(notesIntent, getResources().getText(R.string.send_to)));
     }
 
-    public void createAlert(Calendar alertDate) {
+    public void createAlert(Calendar alertDate, String alertTitle, String alertSubText) {
         long alert = alertDate.getTimeInMillis();
         Intent intent = new Intent(EditCourse.this, ScheduleReceiver.class);
+        intent.putExtra("title", alertTitle);
+        intent.putExtra("subText", alertSubText);
         PendingIntent sender = PendingIntent.getBroadcast(EditCourse.this, 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, alert, sender);
