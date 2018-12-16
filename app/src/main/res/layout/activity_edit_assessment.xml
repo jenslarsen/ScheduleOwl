@@ -33,17 +33,37 @@
         android:id="@+id/textViewDueDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Due Date" />
+        android:text="@string/due_date" />
 
-    <EditText
-        android:id="@+id/editTextDueDate"
-        android:layout_width="match_parent"
+
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:ems="10"
-        android:focusable="false"
-        android:hint="@string/date_prompt"
-        android:inputType="date" />
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editTextDueDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:clickable="true"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="@string/date_prompt"
+            android:inputType="date" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/add_alert" />
+
+        <CheckBox
+            android:id="@+id/checkBoxDueDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

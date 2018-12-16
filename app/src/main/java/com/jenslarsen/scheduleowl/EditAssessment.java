@@ -1,7 +1,10 @@
 package com.jenslarsen.scheduleowl;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,6 +21,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -39,6 +43,8 @@ public class EditAssessment extends AppCompatActivity implements LoaderManager.L
     private Uri currentAssessmentUri;
     private EditText editTextTitle;
     private EditText editTextDueDate;
+    private CheckBox checkBoxDueDate;
+    private boolean dueDateChecked;
 
     private String dateFormat = "yyyy-MM-dd";
 
@@ -62,6 +68,9 @@ public class EditAssessment extends AppCompatActivity implements LoaderManager.L
         TextView textViewEditAssessment = findViewById(R.id.textViewEditAssessment);
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextDueDate = findViewById(R.id.editTextDueDate);
+        checkBoxDueDate = findViewById(R.id.checkBoxDueDate);
+
+        dueDateChecked = false;
 
         if (currentAssessmentUri == null) {
             // No Uri so we must be adding an assessment
@@ -94,6 +103,14 @@ public class EditAssessment extends AppCompatActivity implements LoaderManager.L
                         calendar.get(Calendar.MONTH),
                         calendar.get(Calendar.DAY_OF_MONTH))
                         .show();
+            }
+        });
+
+        // set up checkbox onClickListener
+        checkBoxDueDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dueDateChecked = !dueDateChecked;
             }
         });
     }
@@ -134,6 +151,19 @@ public class EditAssessment extends AppCompatActivity implements LoaderManager.L
                 Toast.makeText(this, getString(R.string.update_successful), Toast.LENGTH_SHORT).show();
             }
         }
+
+        // set up alerts
+        if (dueDateChecked) {
+            try {
+                Date date = sdf.parse(editTextDueDate.getText().toString());
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                createAlert(cal, editTextTitle.getText().toString(), "Due today");
+            } catch (ParseException e) {
+                Toast.makeText(this, "Unable to parse start date!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         finish();
     }
 
@@ -219,5 +249,15 @@ public class EditAssessment extends AppCompatActivity implements LoaderManager.L
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         editTextTitle.setText("");
         editTextDueDate.setText("");
+    }
+
+    public void createAlert(Calendar alertDate, String alertTitle, String alertSubText) {
+        long alert = alertDate.getTimeInMillis();
+        Intent intent = new Intent(EditAssessment.this, ScheduleReceiver.class);
+        intent.putExtra("title", alertTitle);
+        intent.putExtra("subText", alertSubText);
+        PendingIntent sender = PendingIntent.getBroadcast(EditAssessment.this, 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alert, sender);
     }
 }
