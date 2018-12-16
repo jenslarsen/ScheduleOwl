@@ -56,9 +56,10 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     private ListView listViewMentors;
     private CheckBox checkBoxEnd;
     private CheckBox checkBoxStart;
+    private Spinner spinnerCourseStatus;
     private boolean startBoxChecked;
     private boolean endBoxChecked;
-    private int courseStatus;  // TODO: Save course status to database
+    private int courseStatus;
 
 
     private String dateFormat = "yyyy-MM-dd";
@@ -89,7 +90,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
         Button deleteButton = findViewById(R.id.buttonDelete);
         TextView textViewAddCourse = findViewById(R.id.textViewAddCourse);
-        Spinner spinnerCourseStatus = findViewById(R.id.spinnerCourseStatus);
+        spinnerCourseStatus = findViewById(R.id.spinnerCourseStatus);
         editTextTitle = findViewById(R.id.editTextTitle);
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
@@ -188,10 +189,13 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
     public void buttonSaveClicked(View view) {
 
+        // TODO: Save Notes
+
         // get input from fields
         String title = editTextTitle.getText().toString().trim();
         String start = editTextStartDate.getText().toString().trim();
         String end = editTextEndDate.getText().toString().trim();
+        courseStatus = spinnerCourseStatus.getSelectedItemPosition();
 
         if (currentCourseUri == null
                 && TextUtils.isEmpty(title)
@@ -206,6 +210,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         values.put(CourseEntry.TITLE, title);
         values.put(CourseEntry.START_DATE, start);
         values.put(CourseEntry.END_DATE, end);
+        values.put(CourseEntry.STATUS, courseStatus);
 
         // set up alerts
         if (startBoxChecked) {
@@ -340,7 +345,8 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                     CourseEntry._ID,
                     CourseEntry.TITLE,
                     CourseEntry.START_DATE,
-                    CourseEntry.END_DATE
+                    CourseEntry.END_DATE,
+                    CourseEntry.STATUS
             };
 
             if (currentCourseUri == null) {
@@ -427,14 +433,17 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                 int titleIndex = cursor.getColumnIndex(CourseEntry.TITLE);
                 int startIndex = cursor.getColumnIndex(CourseEntry.START_DATE);
                 int endIndex = cursor.getColumnIndex(CourseEntry.END_DATE);
+                int statusIndex = cursor.getColumnIndex(CourseEntry.STATUS);
 
                 String title = cursor.getString(titleIndex);
                 String start = cursor.getString(startIndex);
                 String end = cursor.getString(endIndex);
+                courseStatus = cursor.getInt(statusIndex);
 
                 editTextTitle.setText(title);
                 editTextStartDate.setText(start);
                 editTextEndDate.setText(end);
+                spinnerCourseStatus.setSelection(courseStatus);
             }
         } else if (id == ASSESSMENT_LOADER) {
             // get a list of assessments associated with the current course
