@@ -74,6 +74,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
 
         Intent intent = getIntent();
         currentTermUri = intent.getData();
+        currentTermId = ScheduleDbHelper.getIdFromUri(currentTermUri);
 
         getSupportLoaderManager().initLoader(TERM_LOADER, null, this);
         getSupportLoaderManager().initLoader(COURSE_LOADER, null, this);
@@ -191,6 +192,16 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                         if (courseRowsUpdated < 1) {
                             Toast.makeText(this, "Error updating course " + courseId + " with termId!", Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        String courseId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(CourseEntry.CONTENT_URI, courseId);
+                        ContentValues addTermId = new ContentValues();
+                        addTermId.put(CourseEntry.TERMID, 0);
+                        int courseRowsUpdated = getContentResolver()
+                                .update(uri, addTermId, null, null);
+                        if (courseRowsUpdated < 1) {
+                            Toast.makeText(this, "Error updating course " + courseId + " with termId!", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
                 Toast.makeText(this, getString(R.string.insert_successful), Toast.LENGTH_SHORT).show();
@@ -214,6 +225,16 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                         Uri uri = Uri.withAppendedPath(CourseEntry.CONTENT_URI, courseId);
                         ContentValues addTermId = new ContentValues();
                         addTermId.put(CourseEntry.TERMID, currentTermId);
+                        int courseRowsUpdated = getContentResolver()
+                                .update(uri, addTermId, null, null);
+                        if (courseRowsUpdated < 1) {
+                            Toast.makeText(this, "Error updating course " + courseId + " with termId!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        String courseId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(CourseEntry.CONTENT_URI, courseId);
+                        ContentValues addTermId = new ContentValues();
+                        addTermId.put(CourseEntry.TERMID, 0);
                         int courseRowsUpdated = getContentResolver()
                                 .update(uri, addTermId, null, null);
                         if (courseRowsUpdated < 1) {
@@ -357,10 +378,8 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                         null,
                         null);
             } else {  // get terms that are associated with the current term and unassociated terms
-                String selection = CourseEntry.TERMID + " IS NULL or "
+                String selection = CourseEntry.TERMID + " IS NULL or " + CourseEntry.TERMID + " = 0  or "
                         + CourseEntry.TERMID + "=?";
-
-                Toast.makeText(this, "currentTermId: " + currentTermId, Toast.LENGTH_SHORT).show();
                 String[] selectionArgs = {String.valueOf(currentTermId)};
 
                 return new CursorLoader(this,
