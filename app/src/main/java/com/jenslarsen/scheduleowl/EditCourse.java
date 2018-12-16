@@ -54,8 +54,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     private EditText editTextNotes;
     private ListView listViewAssessments;
     private ListView listViewMentors;
-    private CheckBox checkBoxEnd;
-    private CheckBox checkBoxStart;
     private Spinner spinnerCourseStatus;
     private boolean startBoxChecked;
     private boolean endBoxChecked;
@@ -97,8 +95,8 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         editTextNotes = findViewById(R.id.editTextNotes);
         listViewAssessments = findViewById(R.id.listViewAssessments);
         listViewMentors = findViewById(R.id.listViewMentors);
-        checkBoxStart = findViewById(R.id.checkBoxStart);
-        checkBoxEnd = findViewById(R.id.checkBoxEnd);
+        CheckBox checkBoxStart = findViewById(R.id.checkBoxStart);
+        CheckBox checkBoxEnd = findViewById(R.id.checkBoxEnd);
 
 
         // set up spinner
@@ -189,19 +187,17 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
 
     public void buttonSaveClicked(View view) {
 
-        // TODO: Save Notes
-
         // get input from fields
         String title = editTextTitle.getText().toString().trim();
         String start = editTextStartDate.getText().toString().trim();
         String end = editTextEndDate.getText().toString().trim();
+        String notes = editTextNotes.getText().toString().trim();
         courseStatus = spinnerCourseStatus.getSelectedItemPosition();
 
         if (currentCourseUri == null
                 && TextUtils.isEmpty(title)
                 && TextUtils.isEmpty(start)
                 && TextUtils.isEmpty(end)) {
-            // nothing entered, nothing to do
             Toast.makeText(this, "Unable to save. Nothing entered!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -211,6 +207,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         values.put(CourseEntry.START_DATE, start);
         values.put(CourseEntry.END_DATE, end);
         values.put(CourseEntry.STATUS, courseStatus);
+        values.put(CourseEntry.NOTES, notes);
 
         // set up alerts
         if (startBoxChecked) {
@@ -346,13 +343,15 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                     CourseEntry.TITLE,
                     CourseEntry.START_DATE,
                     CourseEntry.END_DATE,
-                    CourseEntry.STATUS
+                    CourseEntry.STATUS,
+                    CourseEntry.NOTES
             };
 
             if (currentCourseUri == null) {
                 uri = CourseEntry.CONTENT_URI;
             } else {
                 uri = currentCourseUri;
+                currentCourseId = ScheduleDbHelper.getIdFromUri(uri);
             }
 
             return new CursorLoader(
@@ -380,7 +379,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                         null,
                         null);
             } else {  // get assessments that are associated with the current course and unassociated courses
-                // TODO: This does seem to be working right?? Not loaded associated assessments when editing a course
                 String selection = ScheduleContract.AssessmentEntry.COURSEID + " IS NULL or "
                         + ScheduleContract.AssessmentEntry.COURSEID + "=?";
 
@@ -434,16 +432,19 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                 int startIndex = cursor.getColumnIndex(CourseEntry.START_DATE);
                 int endIndex = cursor.getColumnIndex(CourseEntry.END_DATE);
                 int statusIndex = cursor.getColumnIndex(CourseEntry.STATUS);
+                int notesIndex = cursor.getColumnIndex(CourseEntry.NOTES);
 
                 String title = cursor.getString(titleIndex);
                 String start = cursor.getString(startIndex);
                 String end = cursor.getString(endIndex);
                 courseStatus = cursor.getInt(statusIndex);
+                String notes = cursor.getString(notesIndex);
 
                 editTextTitle.setText(title);
                 editTextStartDate.setText(start);
                 editTextEndDate.setText(end);
                 spinnerCourseStatus.setSelection(courseStatus);
+                editTextNotes.setText(notes);
             }
         } else if (id == ASSESSMENT_LOADER) {
             // get a list of assessments associated with the current course
@@ -465,6 +466,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             editTextTitle.setText("");
             editTextStartDate.setText("");
             editTextEndDate.setText("");
+            editTextNotes.setText("");
         } else if (id == ASSESSMENT_LOADER) {
             // don't do anything I guess? Not sure if I need to do something here yet.
         }
