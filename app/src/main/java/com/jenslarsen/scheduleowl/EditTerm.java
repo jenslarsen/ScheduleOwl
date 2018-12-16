@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -28,6 +29,8 @@ import android.widget.Toast;
 import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
+import com.jenslarsen.scheduleowl.db.ScheduleProvider;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -62,6 +65,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     /**
      * Sets up the Add/Edit Term activity. Uses currentTermId from the intent to determine if this
      * is a new or existing term.
+     *
      * @param savedInstanceState
      */
     @Override
@@ -141,6 +145,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     /**
      * Saves entered term data into the database. Also updates selected courses with the associated
      * termId
+     *
      * @param view
      */
     public void buttonSaveClicked(View view) {
@@ -225,6 +230,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
 
     /**
      * User cancelled. Nothing to do so finish()
+     *
      * @param view
      */
     public void buttonCancelClicked(View view) {
@@ -233,6 +239,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
 
     /**
      * Prompt the user if they really want to delete this term, then calls deleteTerm if they do.
+     *
      * @param view
      */
     public void buttonDeleteClicked(View view) {
@@ -256,13 +263,30 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
 
         // only delete if this is an existing term
         if (currentTermUri != null) {
-            // TODO: Implement validation so that a term cannot be deleted if courses are assigned to it.
-            int numTermsRemoved = getContentResolver().delete(currentTermUri, null, null);
+            // check if there are any courses associated with this course
+            SQLiteDatabase db = ScheduleProvider.dbHelper.getReadableDatabase();
 
-            if (numTermsRemoved == 0) {
-                Toast.makeText(this, getString(R.string.delete_failed), Toast.LENGTH_SHORT).show();
+            String[] projection = new String[]{
+                    ScheduleContract.CourseEntry._ID,
+                    ScheduleContract.CourseEntry.TITLE,
+                    ScheduleContract.CourseEntry.TERMID
+            };
+
+            String selection = CourseEntry.TERMID + "=?";
+            String[] selectionArgs = {Integer.toString(currentTermId)};
+
+            Cursor cursor = db.query(CourseEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                Toast.makeText(this, "Unable to delete Term. There are still courses associated with it.", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, getString(R.string.delete_successful), Toast.LENGTH_SHORT).show();
+                int numTermsRemoved = getContentResolver().delete(currentTermUri, null, null);
+
+                if (numTermsRemoved == 0) {
+                    Toast.makeText(this, getString(R.string.delete_failed), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, getString(R.string.delete_successful), Toast.LENGTH_SHORT).show();
+                }
             }
         }
         finish();
@@ -285,6 +309,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
     /**
      * Load data. Uses id to determine if this is term or course data, and uses the currentTermId to
      * determine if this a new or existing term.
+     *
      * @param id
      * @param bundle
      * @return
@@ -332,7 +357,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                         null,
                         null);
             } else {  // get terms that are associated with the current term and unassociated terms
-                // TODO: This does seem to be working right?? Not loaded associated courses when editing a term
+                // TODO: This doesn't seem to be working right?? Not loaded associated courses when editing a term
                 String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL or "
                         + ScheduleContract.CourseEntry.TERMID + "=?";
 
