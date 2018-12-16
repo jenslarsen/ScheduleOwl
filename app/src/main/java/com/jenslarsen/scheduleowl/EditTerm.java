@@ -301,7 +301,6 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             };
 
             if (currentTermUri == null) {
-                // TODO: Probably a better way to do this. Returning all terms if this is a new term - seems like a waste of time.
                 uri = TermEntry.CONTENT_URI;
             } else {
                 uri = currentTermUri;

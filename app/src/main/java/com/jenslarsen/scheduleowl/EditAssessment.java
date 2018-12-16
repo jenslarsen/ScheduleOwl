@@ -55,9 +55,6 @@ public class EditAssessment extends AppCompatActivity implements LoaderManager.L
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // TODO: set alerts for goal dates, that will trigger when the application is not running
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_assessment);
 

@@ -80,6 +80,9 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         Intent intent = getIntent();
         currentCourseUri = intent.getData();
 
+        startBoxChecked = false;
+        endBoxChecked = false;
+
         getSupportLoaderManager().initLoader(COURSE_LOADER, null, this);
         getSupportLoaderManager().initLoader(ASSESSMENT_LOADER, null, this);
         getSupportLoaderManager().initLoader(MENTOR_LOADER, null, this);
@@ -169,16 +172,16 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         checkBoxStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startBoxChecked = checkBoxStart.isChecked();
-                Toast.makeText(EditCourse.this, "Start Click: " + startBoxChecked, Toast.LENGTH_SHORT).show();
+                // startBoxChecked = checkBoxStart.isChecked();
+                startBoxChecked = !startBoxChecked;
             }
         });
 
         checkBoxEnd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                endBoxChecked = checkBoxEnd.isChecked();
-                Toast.makeText(EditCourse.this, "End Click: " + endBoxChecked, Toast.LENGTH_SHORT).show();
+                // endBoxChecked = checkBoxEnd.isChecked();
+                endBoxChecked = !endBoxChecked;
             }
         });
     }
@@ -208,7 +211,6 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         if (startBoxChecked) {
             try {
                 Date date = sdf.parse(editTextStartDate.getText().toString());
-                Toast.makeText(this, "Setting alert for " + editTextStartDate.getText().toString(), Toast.LENGTH_SHORT).show();
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(date);
                 createAlert(cal, editTextTitle.getText().toString(), "Starting today");
