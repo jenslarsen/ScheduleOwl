@@ -53,10 +53,6 @@ public final class ScheduleContract {
         public static final String NOTES = "notes";
         public static final String MENTORID = "mentorId";
         public static final String TERMID = "termId";
-        public static final int IN_PROGRESS = 0;
-        public static final int COMPLETED = 1;
-        public static final int DROPPED = 2;
-        public static final int PLANNED = 3;
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_COURSE);
         /**
          * The MIME type of the {@link #CONTENT_URI} for a list of courses.
