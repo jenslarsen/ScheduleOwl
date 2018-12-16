@@ -26,11 +26,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jenslarsen.scheduleowl.db.ScheduleContract;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.TermEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
 import com.jenslarsen.scheduleowl.db.ScheduleProvider;
-import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -184,9 +183,9 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                     textViewId = listViewCourses.getChildAt(index).findViewById(R.id.textViewId);
                     if (checkBox.isChecked()) {
                         String courseId = textViewId.getText().toString();
-                        Uri uri = Uri.withAppendedPath(ScheduleContract.CourseEntry.CONTENT_URI, courseId);
+                        Uri uri = Uri.withAppendedPath(CourseEntry.CONTENT_URI, courseId);
                         ContentValues addTermId = new ContentValues();
-                        addTermId.put(ScheduleContract.CourseEntry.TERMID, currentTermId);
+                        addTermId.put(CourseEntry.TERMID, currentTermId);
                         int courseRowsUpdated = getContentResolver()
                                 .update(uri, addTermId, null, null);
                         if (courseRowsUpdated < 1) {
@@ -212,9 +211,9 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                     textViewId = listViewCourses.getChildAt(index).findViewById(R.id.textViewId);
                     if (checkBox.isChecked()) {
                         String courseId = textViewId.getText().toString();
-                        Uri uri = Uri.withAppendedPath(ScheduleContract.CourseEntry.CONTENT_URI, courseId);
+                        Uri uri = Uri.withAppendedPath(CourseEntry.CONTENT_URI, courseId);
                         ContentValues addTermId = new ContentValues();
-                        addTermId.put(ScheduleContract.CourseEntry.TERMID, currentTermId);
+                        addTermId.put(CourseEntry.TERMID, currentTermId);
                         int courseRowsUpdated = getContentResolver()
                                 .update(uri, addTermId, null, null);
                         if (courseRowsUpdated < 1) {
@@ -267,9 +266,9 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             SQLiteDatabase db = ScheduleProvider.dbHelper.getReadableDatabase();
 
             String[] projection = new String[]{
-                    ScheduleContract.CourseEntry._ID,
-                    ScheduleContract.CourseEntry.TITLE,
-                    ScheduleContract.CourseEntry.TERMID
+                    CourseEntry._ID,
+                    CourseEntry.TITLE,
+                    CourseEntry.TERMID
             };
 
             String selection = CourseEntry.TERMID + "=?";
@@ -329,6 +328,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                 uri = TermEntry.CONTENT_URI;
             } else {
                 uri = currentTermUri;
+                currentTermId = ScheduleDbHelper.getIdFromUri(uri);
             }
 
             return new CursorLoader(
@@ -340,32 +340,31 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
                     null);
         } else if (id == COURSE_LOADER) {
             String[] projection = new String[]{
-                    ScheduleContract.CourseEntry._ID,
-                    ScheduleContract.CourseEntry.TITLE,
-                    ScheduleContract.CourseEntry.START_DATE,
-                    ScheduleContract.CourseEntry.END_DATE,
-                    ScheduleContract.CourseEntry.TERMID
+                    CourseEntry._ID,
+                    CourseEntry.TITLE,
+                    CourseEntry.START_DATE,
+                    CourseEntry.END_DATE,
+                    CourseEntry.TERMID
             };
 
             if (currentTermUri == null) { // only return courses not associated
-                String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL";
+                String selection = CourseEntry.TERMID + " IS NULL";
 
                 return new CursorLoader(this,
-                        ScheduleContract.CourseEntry.CONTENT_URI,
+                        CourseEntry.CONTENT_URI,
                         projection,
                         selection,
                         null,
                         null);
             } else {  // get terms that are associated with the current term and unassociated terms
-                // TODO: This doesn't seem to be working right?? Not loaded associated courses when editing a term
-                String selection = ScheduleContract.CourseEntry.TERMID + " IS NULL or "
-                        + ScheduleContract.CourseEntry.TERMID + "=?";
+                String selection = CourseEntry.TERMID + " IS NULL or "
+                        + CourseEntry.TERMID + "=?";
 
                 Toast.makeText(this, "currentTermId: " + currentTermId, Toast.LENGTH_SHORT).show();
                 String[] selectionArgs = {String.valueOf(currentTermId)};
 
                 return new CursorLoader(this,
-                        ScheduleContract.CourseEntry.CONTENT_URI,
+                        CourseEntry.CONTENT_URI,
                         projection,
                         selection,
                         selectionArgs,
