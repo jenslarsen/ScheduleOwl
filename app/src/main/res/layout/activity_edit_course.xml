@@ -156,13 +156,28 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/select_mentors" />
+        android:text="@string/course_mentor" />
 
-    <ListView
-        android:id="@+id/listViewMentors"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    <TextView
+        android:id="@+id/textViewMentorName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/textViewMentorEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/textViewMentorPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="18sp" />
 
     <LinearLayout
         android:layout_width="match_parent"

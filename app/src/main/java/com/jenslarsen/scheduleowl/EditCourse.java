@@ -32,7 +32,10 @@ import android.widget.Toast;
 
 import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
+import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
+import com.jenslarsen.scheduleowl.model.Course;
+import com.jenslarsen.scheduleowl.model.Mentor;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,12 +55,15 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
     private EditText editTextStartDate;
     private EditText editTextEndDate;
     private EditText editTextNotes;
+    private TextView textViewMentorName;
+    private TextView textViewMentorPhone;
+    private TextView textViewMentorEmail;
     private ListView listViewAssessments;
-    private ListView listViewMentors;
     private Spinner spinnerCourseStatus;
     private boolean startBoxChecked;
     private boolean endBoxChecked;
     private int courseStatus;
+    private int currentMentorId;
 
 
     private String dateFormat = "yyyy-MM-dd";
@@ -93,8 +99,10 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
         editTextEndDate = findViewById(R.id.editTextEndDate);
         editTextStartDate = findViewById(R.id.editTextStartDate);
         editTextNotes = findViewById(R.id.editTextNotes);
+        textViewMentorName = findViewById(R.id.textViewMentorName);
+        textViewMentorPhone = findViewById(R.id.textViewMentorPhone);
+        textViewMentorEmail = findViewById(R.id.textViewMentorEmail);
         listViewAssessments = findViewById(R.id.listViewAssessments);
-        listViewMentors = findViewById(R.id.listViewMentors);
         CheckBox checkBoxStart = findViewById(R.id.checkBoxStart);
         CheckBox checkBoxEnd = findViewById(R.id.checkBoxEnd);
 
@@ -247,6 +255,7 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                     checkBox = listViewAssessments.getChildAt(index).findViewById(R.id.checkBoxChooser);
                     textViewId = listViewAssessments.getChildAt(index).findViewById(R.id.textViewId);
                     if (checkBox.isChecked()) {
+                        // update the assessment with the currentCourseId
                         String assessmentId = textViewId.getText().toString();
                         Uri uri = Uri.withAppendedPath(ScheduleContract.AssessmentEntry.CONTENT_URI, assessmentId);
                         ContentValues addCourseId = new ContentValues();
@@ -255,6 +264,17 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                                 .update(uri, addCourseId, null, null);
                         if (assessmentRowsUpdated < 1) {
                             Toast.makeText(this, "Error updating assessment " + assessmentId + " with courseId!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        // remove the courseId from the assessment
+                        String assessmentId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(ScheduleContract.AssessmentEntry.CONTENT_URI, assessmentId);
+                        ContentValues addCourseId = new ContentValues();
+                        addCourseId.put(ScheduleContract.AssessmentEntry.COURSEID, 0);
+                        int assessmentRowsUpdated = getContentResolver()
+                                .update(uri, addCourseId, null, null);
+                        if (assessmentRowsUpdated < 1) {
+                            Toast.makeText(this, "Error removing courseId from " + assessmentId, Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -282,6 +302,17 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                                 .update(uri, addCourseId, null, null);
                         if (assessmentRowsUpdated < 1) {
                             Toast.makeText(this, "Error updating assessment " + assessmentId + " with courseId!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        // remove the courseId from the assessment
+                        String assessmentId = textViewId.getText().toString();
+                        Uri uri = Uri.withAppendedPath(ScheduleContract.AssessmentEntry.CONTENT_URI, assessmentId);
+                        ContentValues addCourseId = new ContentValues();
+                        addCourseId.put(ScheduleContract.AssessmentEntry.COURSEID, 0);
+                        int assessmentRowsUpdated = getContentResolver()
+                                .update(uri, addCourseId, null, null);
+                        if (assessmentRowsUpdated < 1) {
+                            Toast.makeText(this, "Error removing courseId from " + assessmentId, Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -344,7 +375,8 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                     CourseEntry.START_DATE,
                     CourseEntry.END_DATE,
                     CourseEntry.STATUS,
-                    CourseEntry.NOTES
+                    CourseEntry.NOTES,
+                    CourseEntry.MENTORID
             };
 
             if (currentCourseUri == null) {
@@ -392,6 +424,10 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                         null);
             }
         } else if (id == MENTOR_LOADER) {
+            String selection = MentorEntry._ID + " = ?";
+
+            String[] selectionArgs = {Integer.toString(currentMentorId)};
+
             String[] projection = new String[]{
                     ScheduleContract.MentorEntry._ID,
                     ScheduleContract.MentorEntry.NAME,
@@ -402,8 +438,8 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             return new CursorLoader(this,
                     ScheduleContract.MentorEntry.CONTENT_URI,
                     projection,
-                    null,
-                    null,
+                    selection,
+                    selectionArgs,
                     null);
         }
         Log.e("EditCourse", "Invalid ID: " + id + " in onCreateLoader()!");
@@ -433,12 +469,14 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                 int endIndex = cursor.getColumnIndex(CourseEntry.END_DATE);
                 int statusIndex = cursor.getColumnIndex(CourseEntry.STATUS);
                 int notesIndex = cursor.getColumnIndex(CourseEntry.NOTES);
+                int mentorIndex = cursor.getColumnIndex(CourseEntry.MENTORID);
 
                 String title = cursor.getString(titleIndex);
                 String start = cursor.getString(startIndex);
                 String end = cursor.getString(endIndex);
                 courseStatus = cursor.getInt(statusIndex);
                 String notes = cursor.getString(notesIndex);
+                currentMentorId = cursor.getInt(mentorIndex);
 
                 editTextTitle.setText(title);
                 editTextStartDate.setText(start);
@@ -452,10 +490,19 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
                     new AssessmentSelectorCursorAdapter(this, cursor, currentCourseId);
             listViewAssessments.setAdapter(assessmentAdapter);
         } else if (id == MENTOR_LOADER) {
-            // get a list of mentors associated with the current course
-            MentorSelectorCursorAdapter mentorAdapter =
-                    new MentorSelectorCursorAdapter(this, cursor, currentCourseId);
-            listViewMentors.setAdapter(mentorAdapter);
+            if (cursor.moveToFirst()) {
+                int nameIndex = cursor.getColumnIndex(MentorEntry.NAME);
+                int phoneIndex = cursor.getColumnIndex(MentorEntry.PHONE);
+                int emailIndex = cursor.getColumnIndex(MentorEntry.EMAIL);
+
+                String name = cursor.getString(nameIndex);
+                String phone = cursor.getString(phoneIndex);
+                String email = cursor.getString(emailIndex);
+
+                textViewMentorName.setText(name);
+                textViewMentorPhone.setText(phone);
+                textViewMentorEmail.setText(email);
+            }
         }
     }
 
@@ -469,6 +516,11 @@ public class EditCourse extends AppCompatActivity implements LoaderManager.Loade
             editTextNotes.setText("");
         } else if (id == ASSESSMENT_LOADER) {
             // don't do anything I guess? Not sure if I need to do something here yet.
+        } else if (id == MENTOR_LOADER) {
+            textViewMentorName.setText("");
+            textViewMentorPhone.setText("");
+            textViewMentorEmail.setText("");
+
         }
     }
 
