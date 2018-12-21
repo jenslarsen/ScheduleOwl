@@ -341,7 +341,7 @@ public class ScheduleProvider extends ContentProvider {
         }
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int numItemsUpdated = db.update(CourseEntry.TABLE_NAME, contentValues, selection, selectionArgs);
+        int numItemsUpdated = db.update(MentorEntry.TABLE_NAME, contentValues, selection, selectionArgs);
         if (numItemsUpdated < 1) {
             Log.e(LOG_TAG, "Failed to update course:" + uri);
             return -1;
