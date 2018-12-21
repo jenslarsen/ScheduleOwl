@@ -34,8 +34,6 @@ import com.jenslarsen.scheduleowl.db.ScheduleContract;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.CourseEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleContract.MentorEntry;
 import com.jenslarsen.scheduleowl.db.ScheduleDbHelper;
-import com.jenslarsen.scheduleowl.model.Course;
-import com.jenslarsen.scheduleowl.model.Mentor;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -369,8 +369,7 @@ public class EditTerm extends AppCompatActivity implements LoaderManager.LoaderC
             };
 
             if (currentTermUri == null) { // only return courses not associated
-                String selection = CourseEntry.TERMID + " IS NULL";
-
+                String selection = CourseEntry.TERMID + " IS NULL or " + CourseEntry.TERMID + " = 0";
                 return new CursorLoader(this,
                         CourseEntry.CONTENT_URI,
                         projection,
